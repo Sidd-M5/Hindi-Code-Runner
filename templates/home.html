@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeMorph - हिंदी में कोडिंग सीखें</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --secondary-color: #8b5cf6;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --dark-bg: #0f172a;
+      --light-bg: #f8fafc;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Noto Sans Devanagari", "Inter", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6366f1 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1050;
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color) !important;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-brand .brand-icon {
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 0.5rem;
+      border-radius: 12px;
+      font-size: 1.2rem;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-auth {
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-login {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+
+    .btn-login:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-signup {
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-signup:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      color: white;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      height: calc(100vh - 80px);
+      position: fixed;
+      top: 80px;
+      left: -280px;
+      width: 280px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-color);
+      padding: 2rem 0;
+      overflow-y: auto;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .sidebar.show {
+      left: 0;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 3px;
+    }
+
+    .sidebar-header {
+      padding: 0 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-header h4 {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .progress-container {
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 10px;
+      padding: 0.5rem;
+    }
+
+    .progress {
+      height: 8px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: 6px;
+      transition: width 0.5s ease;
+    }
+
+    .sidebar-nav {
+      padding: 0 1rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      margin: 0.25rem 0;
+      text-decoration: none;
+      color: var(--text-secondary);
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-nav a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .sidebar-nav a:hover::before {
+      left: 100%;
+    }
+
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      transform: translateX(8px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .sidebar-nav a i {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 90px;
+      left: 20px;
+      z-index: 1001;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .toggle-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+    }
+
+    .toggle-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Content Styles */
+    .content {
+      margin-left: 0;
+      margin-top: 80px;
+      padding: 2rem;
+      transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: calc(100vh - 80px);
+    }
+
+    .content.shifted {
+      margin-left: 280px;
+    }
+
+    .content-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .content-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .content-title i {
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .content-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    /* Alert Styles */
+    .alert-custom {
+      border: none;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .alert-info {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+
+    .alert-success {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid #10b981;
+      color: #047857;
+    }
+
+    /* Code Styles */
+    .code-container {
+      position: relative;
+      margin: 2rem 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .code-header {
+      background: linear-gradient(45deg, #1e293b, #334155);
+      color: white;
+      padding: 1rem 1.5rem;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .code-header .language-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 2rem;
+      margin: 0;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Output Styles */
+    .output {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      border: 2px solid var(--success-color);
+      padding: 1.5rem;
+      border-radius: 16px;
+      margin: 1.5rem 0;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+    }
+
+    .output::before {
+      content: "📤 आउटपुट";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--success-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Noto Sans Devanagari', sans-serif;
+    }
+
+    .error-output {
+      background: linear-gradient(135deg, #fef2f2, #fecaca);
+      border: 2px solid var(--danger-color);
+      padding: 1.5rem;
+      border-radius: 16px;
+      margin: 1.5rem 0;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+    }
+
+    .error-output::before {
+      content: "❌ त्रुटि";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--danger-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Noto Sans Devanagari', sans-serif;
+    }
+
+    /* Button Styles */
+    .btn-try {
+      background: linear-gradient(45deg, var(--success-color), #059669);
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 2rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .btn-try:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+      color: white;
+    }
+
+    .btn-try:active {
+      transform: translateY(-1px);
+    }
+
+    /* Interactive Elements */
+    .interactive-demo {
+      background: rgba(99, 102, 241, 0.05);
+      border: 2px dashed var(--primary-color);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .interactive-demo::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .interactive-demo:hover::before {
+      opacity: 1;
+    }
+
+    .interactive-demo:hover {
+      background: rgba(99, 102, 241, 0.1);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Authentication Modal */
+    .auth-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .auth-modal.show {
+      display: flex;
+    }
+
+    .auth-modal-content {
+      background: white;
+      padding: 3rem;
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: color 0.3s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--danger-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .content.shifted {
+        margin-left: 0;
+      }
+      
+      .sidebar {
+        width: 100%;
+        left: -100%;
+      }
+      
+      .content-title {
+        font-size: 2rem;
+      }
+      
+      .toggle-btn {
+        left: 15px;
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .content {
+        padding: 1rem;
+      }
+      
+      .content-card {
+        padding: 1.5rem;
+      }
+      
+      .content-title {
+        font-size: 1.8rem;
+      }
+      
+      .navbar-brand {
+        font-size: 1.2rem;
+      }
+      
+      .auth-buttons {
+        gap: 0.5rem;
+      }
+      
+      .btn-auth {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Syntax Highlighting */
+    .keyword { color: #c678dd; }
+    .string { color: #98c379; }
+    .comment { color: #5c6370; font-style: italic; }
+    .function { color: #61afef; }
+    .number { color: #d19a66; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container-fluid">
+      <div class="navbar-brand">
+        <div class="brand-icon">
+          <i class="fas fa-code"></i>
+        </div>
+        CodeMorph(HindCode)- हिंदी कोडिंग
+      </div>
+      <div class="auth-buttons">
+        {% if session.get('username') %}
+          <span class="me-3">👋 नमस्ते, {{ session['username'] }}</span>
+          <a href="/logout" class="tool-btn btn-warning btn-sm">लॉगआउट</a>
+        {% else %}
+          <a href="/login" class="tool-btn-login">लॉगिन</a>
+          <a href="/signup" class="tool-btn-signup ms-2">साइन अप</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toggle Button -->
+  <button class="toggle-btn" onclick="toggleSidebar()" id="toggleBtn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h4>
+        <i class="fas fa-graduation-cap"></i>
+        सीखने का रोडमैप
+      </h4>
+      <div class="progress-container">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" style="width: 11%" id="progressBar"></div>
+        </div>
+        <small class="text-muted mt-2 d-block">प्रगति: <span id="progressText">11%</span></small>
+      </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="#" class="active" onclick="showContent('intro', this)" data-progress="11">
+        <i class="fas fa-play-circle"></i>
+        कोडिंग क्या है?
+      </a>
+      <a href="#" onclick="showContent('print', this)" data-progress="22">
+        <i class="fas fa-print"></i>
+        छापें (Print)
+      </a>
+      <a href="#" onclick="showContent('variables', this)" data-progress="33">
+        <i class="fas fa-box"></i>
+        चर (Variables)
+      </a>
+      <a href="#" onclick="showContent('datatypes', this)" data-progress="44">
+        <i class="fas fa-database"></i>
+        डेटा प्रकार
+      </a>
+      <a href="#" onclick="showContent('conditions', this)" data-progress="55">
+        <i class="fas fa-question-circle"></i>
+        शर्तें
+      </a>
+      <a href="#" onclick="showContent('loops', this)" data-progress="66">
+        <i class="fas fa-sync-alt"></i>
+        चक्र (Loops)
+      </a>
+      <a href="#" onclick="showContent('functions', this)" data-progress="77">
+        <i class="fas fa-cogs"></i>
+        प्रकार्य (Functions)
+      </a>
+      <a href="#" onclick="showContent('collections', this)" data-progress="88">
+        <i class="fas fa-layer-group"></i>
+        संग्रह (Collections)
+      </a>
+      <a href="#" onclick="showContent('oop', this)" data-progress="100">
+        <i class="fas fa-cube"></i>
+        ऑब्जेक्ट प्रोग्रामिंग
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content" id="content">
+    <div class="content-card">
+      <h1 class="content-title">
+        <i class="fas fa-rocket"></i>
+        कोडिंग की दुनिया में आपका स्वागत है!
+      </h1>
+      <p class="content-subtitle">
+        हिंदी में प्रोग्रामिंग सीखना अब हुआ आसान! CodeMorph के साथ शुरू करें अपनी कोडिंग यात्रा।
+      </p>
+      
+      <div class="alert-custom alert-info">
+        <i class="fas fa-lightbulb"></i>
+        <strong>क्या आप जानते हैं?</strong> दुनिया का पहला कंप्यूटर प्रोग्राम 1843 में Ada Lovelace द्वारा लिखा गया था!
+      </div>
+
+      <h3 style="margin-top: 2rem; color: var(--primary-color);">
+        <i class="fas fa-laptop-code"></i>
+        आपका पहला प्रोग्राम
+      </h3>
+      
+      <div class="code-container">
+        <div class="code-header">
+          <div class="language-tag">
+            <i class="fab fa-python"></i>
+            Python - हिंदी कोड
+          </div>
+          <button class="copy-btn" onclick="copyToClipboard(this)">
+            <i class="fas fa-copy"></i>
+            कॉपी करें
+          </button>
+        </div>
+        <pre><code><span class="keyword">छापें</span>(<span class="string">"🙏 नमस्ते! मैं अपना पहला प्रोग्राम लिख रहा हूँ!"</span>)
+<span class="keyword">छापें</span>(<span class="string">"🚀 कोडिंग सीखना है मज़ेदार!"</span>)
+
+<span class="comment"># यह एक टिप्पणी है</span>
+<span class="keyword">नाम</span> = <span class="string">"आपका नाम"</span>
+<span class="keyword">छापें</span>(<span class="string">f"नमस्ते {नाम}, कोडिंग की दुनिया में आपका स्वागत है!"</span>)</code></pre>
+      </div>
+      
+      <div class="output">
+🙏 नमस्ते! मैं अपना पहला प्रोग्राम लिख रहा हूँ!<br>
+🚀 कोडिंग सीखना है मज़ेदार!<br>
+नमस्ते आपका नाम, कोडिंग की दुनिया में आपका स्वागत है!
+      </div>
+      
+      <div class="interactive-demo" onclick="showInteractiveDemo()">
+        <i class="fas fa-play-circle" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+        <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">इंटरैक्टिव डेमो</h4>
+        <p style="color: var(--text-secondary); margin: 0;">इस कोड को लाइव चलाकर देखें!</p>
+      </div>
+      
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="/runner" class="btn-try" onclick="redirectToEditor()">
+          <i class="fas fa-code"></i>
+          खुद कोड लिखकर आज़माएं
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  let isLoggedIn = JSON.parse('{{ session.get("username") is not none | tojson }}');
+  let currentUser = JSON.parse('{{ session.get("username") | tojson }}');
+</script>
+
+  <script>
+    // User authentication state
+    // let isLoggedIn = false;
+    // let currentUser = null;
+
+    // Topics content
+    const topics = {
+      intro: {
+        title: "कोडिंग की शुरुआत",
+        icon: "fas fa-play-circle",
+        content: `
+          <div class="content-card">
+            <h1 class="content-title">
+              <i class="fas fa-rocket"></i>
+              कोडिंग क्या है?
+            </h1>
+            <p class="content-subtitle">
+              कोडिंग का मतलब है कंप्यूटर से बात करना। जैसे आप किसी दोस्त से हिंदी में बात करते हैं, वैसे ही कंप्यूटर से प्रोग्रामिंग भाषा में बात कर सकते हैं।
+            </p>
+            
+            <div class="alert-custom alert-info">
+              <i class="fas fa-lightbulb"></i>
+              <strong>मज़ेदार तथ्य:</strong> दुनिया का पहला कंप्यूटर प्रोग्राम 1843 में Ada Lovelace द्वारा लिखा गया था!
+            </div>
+
+            <h3 style="color: var(--primary-color); margin-top: 2rem;">
+              <i class="fas fa-laptop-code"></i>
+              आपका पहला प्रोग्राम
+            </h3>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <div class="language-tag">
+                  <i class="fab fa-python"></i>
+                  Python - हिंदी कोड
+                </div>
+                <button class="copy-btn" onclick="copyToClipboard(this)">
+                  <i class="fas fa-copy"></i>
+                  कॉपी करें
+                </button>
+              </div>
+              <pre><code><span class="keyword">छापें</span>(<span class="string">"🙏 नमस्ते दुनिया! मैं कोडिंग सीख रहा हूँ!"</span>)</code></pre>
+            </div>
+            
+            <div class="output">
+              🙏 नमस्ते दुनिया! मैं कोडिंग सीख रहा हूँ!
+            </div>
+            
+            <div class="interactive-demo" onclick="showInteractiveDemo()">
+              <i class="fas fa-play-circle" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+              <h4 style="color: var(--primary-color);">लाइव डेमो देखें</h4>
+              <p style="color: var(--text-secondary); margin: 0;">इस कोड को चलाकर देखें कि यह कैसे काम करता है!</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+              <a href="/runner" class="btn-try" onclick="redirectToEditor()">
+                <i class="fas fa-code"></i>
+                खुद कोड लिखकर आज़माएं
+              </a>
+            </div>
+          </div>
+        `
+      },
+      print: {
+        title: "छापें (Print)",
+        icon: "fas fa-print",
+        content: `
+          <div class="content-card">
+            <h1 class="content-title">
+              <i class="fas fa-print"></i>
+              छापें (Print Statement)
+            </h1>
+            <p class="content-subtitle">
+              स्क्रीन पर कुछ भी दिखाने के लिए <code>छापें</code> का उपयोग करते हैं। यह प्रोग्रामिंग की सबसे बुनियादी और महत्वपूर्ण कमांड है।
+            </p>
+            
+            <div class="row">
+              <div class="col-lg-6 mb-4">
+                <h4 style="color: var(--primary-color);">
+                  <i class="fas fa-text-width"></i>
+                  सामान्य टेक्स्ट छापना
+                </h4>
+                <div class="code-container">
+                  <div class="code-header">
+                    <div class="language-tag">उदाहरण 1</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+                  <pre><code><span class="keyword">छापें</span>(<span class="string">"मैं हिंदी में कोड लिख रहा हूँ"</span>)
+<span class="keyword">छापें</span>(<span class="string">"यह बहुत मज़ेदार है!"</span>)</code></pre>
+                </div>
+                <div class="output">
+                  मैं हिंदी में कोड लिख रहा हूँ<br>
+                  यह बहुत मज़ेदार है!
+                </div>
+              </div>
+              
+              <div class="col-lg-6 mb-4">
+                <h4 style="color: var(--primary-color);">
+                  <i class="fas fa-calculator"></i>
+                  संख्याएं छापना
+                </h4>
+                <div class="code-container">
+                  <div class="code-header">
+                    <div class="language-tag">उदाहरण 2</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+                  <pre><code><span class="keyword">छापें</span>(<span class="number">123</span>)
+<span class="keyword">छापें</span>(<span class="number">45.67</span>)
+<span class="keyword">छापें</span>(<span class="number">10 + 5</span>)</code></pre>
+                </div>
+                <div class="output">
+                  123<br>
+                  45.67<br>
+                  15
+                </div>
+              </div>
+            </div>
+            
+            <div class="alert-custom alert-warning">
+              <i class="fas fa-exclamation-circle"></i>
+              <strong>याद रखें:</strong> टेक्स्ट को हमेशा उद्धरण चिह्नों (" ") में लिखें!
+            </div>
+            
+            <div class="interactive-demo" onclick="showInteractiveDemo()">
+              <i class="fas fa-play-circle" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+              <h4 style="color: var(--primary-color);">अलग-अलग चीजें छापकर देखें!</h4>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+              <a href="/runner" class="btn-try" onclick="redirectToEditor()">
+                <i class="fas fa-keyboard"></i>
+                अपना संदेश छापें
+              </a>
+            </div>
+          </div>
+        `
+      },
+      variables: {
+  title: "चर (Variables)",
+  icon: "fas fa-box",
+  content: `
+    <div class="card">
+      <h1 class="content-title"><i class="fas fa-box"></i>चर (Variables) – उदाहरण 1</h1>
+      <div class="code-container">
+                  <div class="code-header">
+                    <div class="language-tag">उदाहरण 1</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+        <pre><code>
+संख्या = 5
+परिणाम = संख्या * 2
+छापें("उत्तर:", परिणाम)
+        </code></pre>
+      </div>
+      <div class="output">
+        <strong>Output:</strong><br>
+        उत्तर: 10
+      </div>
+      <p><strong>व्याख्या:</strong> यहाँ एक संख्या को चर में रखा गया और उसे 2 से गुणा करके आउटपुट निकाला।</p>
+    </div>
+
+    <div class="card">
+      <h1 class="content-title"><i class="fas fa-box"></i>चर (Variables) – उदाहरण 2</h1>
+      <div class="code-container">
+        <div class="code-header">
+                  <div class="language-tag">उदाहरण 2</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+        <pre><code>
+पहला_नाम = "अमित"
+अंतिम_नाम = "शर्मा"
+पूरा_नाम = पहला_नाम + " " + अंतिम_नाम
+छापें("पूरा नाम:", पूरा_नाम)
+        </code></pre>
+      </div>
+      <div class="output">
+        <strong>Output:</strong><br>
+        पूरा नाम: अमित शर्मा
+      </div>
+      <p><strong>व्याख्या:</strong> दो स्ट्रिंग्स को जोड़कर पूरा नाम बनाया गया।</p>
+    </div>
+
+    <div class="card">
+      <h1 class="content-title"><i class="fas fa-box"></i>चर (Variables) – उदाहरण 3</h1>
+      <div class="code-container">
+        <div class="code-header">
+                  <div class="language-tag">उदाहरण 3</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+        <pre><code>
+तापमान = 30
+छापें("आज का तापमान:", तापमान, "डिग्री सेल्सियस")
+        </code></pre>
+      </div>
+      <div class="output">
+        <strong>Output:</strong><br>
+        आज का तापमान: 30 डिग्री सेल्सियस
+      </div>
+      <p><strong>व्याख्या:</strong> संख्या को टेक्स्ट के साथ जोड़कर प्रदर्शित किया गया।</p>
+    </div>
+
+    <div class="card">
+      <h1 class="content-title"><i class="fas fa-box"></i>चर (Variables) – उदाहरण 4</h1>
+      <div class="code-container">
+        <div class="code-header">
+                  <div class="language-tag">उदाहरण 4</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+        <pre><code>
+लॉगिन = True
+छापें("क्या यूज़र लॉगिन है?", लॉगिन)
+        </code></pre>
+      </div>
+      <div class="output">
+        <strong>Output:</strong><br>
+        क्या यूज़र लॉगिन है? True
+      </div>
+      <p><strong>व्याख्या:</strong> यहाँ बूलियन प्रकार का मान स्टोर किया गया है।</p>
+    </div>
+
+    <div class="card">
+      <h1 class="content-title"><i class="fas fa-box"></i>चर (Variables) – उदाहरण 5</h1>
+      <div class="code-container">
+        <div class="code-header">
+                  <div class="language-tag">उदाहरण 5</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+        <pre><code>
+गिनती = 1
+गिनती = गिनती + 4
+छापें("कुल गिनती:", गिनती)
+        </code></pre>
+      </div>
+      <div class="output">
+        <strong>Output:</strong><br>
+        कुल गिनती: 5
+      </div>
+      <p><strong>व्याख्या:</strong> चर के मान को अपडेट किया गया और फिर आउटपुट में दिखाया।</p>
+    </div>
+  `
+},
+
+      // 🔹 DATA TYPES (डेटा प्रकार)
+      datatypes: {
+        icon: "fas fa-database",
+        content: `
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-database"></i>डेटा प्रकार – उदाहरण 1 (पूर्णांक)</h1>
+            <div class="code-container">
+              <div class="code-header">
+                    <div class="language-tag">उदाहरण 1</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      सेब = 10
+      छापें("सेब की संख्या:", सेब)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>सेब की संख्या: 10</div>
+            <p><strong>व्याख्या:</strong> यह एक पूर्णांक डेटा प्रकार है।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-database"></i>डेटा प्रकार – उदाहरण 2 (दशमलव)</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 2</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      मूल्य = 45.75
+      छापें("कुल मूल्य:", मूल्य)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>कुल मूल्य: 45.75</div>
+            <p><strong>व्याख्या:</strong> यह दशमलव (float) डेटा प्रकार का उदाहरण है।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-database"></i>डेटा प्रकार – उदाहरण 3 (स्ट्रिंग)</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 3</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      नाम = "नेहा"
+      छापें("नमस्ते", नाम)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>नमस्ते नेहा</div>
+            <p><strong>व्याख्या:</strong> यह स्ट्रिंग प्रकार का मान है।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-database"></i>डेटा प्रकार – उदाहरण 4 (बूलियन)</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 4</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      खेल = False
+      छापें("क्या खेल चालू है?", खेल)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>क्या खेल चालू है? False</div>
+            <p><strong>व्याख्या:</strong> बूलियन डेटा केवल True या False हो सकता है।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-database"></i>डेटा प्रकार – उदाहरण 5 (None)</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 5</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      डेटा = None
+      छापें("डेटा:", डेटा)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>डेटा: None</div>
+            <p><strong>व्याख्या:</strong> None का अर्थ है कि यहाँ कोई मान उपलब्ध नहीं है।</p>
+          </div>
+        `
+      },
+      // 🔹 CONDITIONS (शर्तें)
+      conditions: {
+        icon: "fas fa-code-branch",
+        content: `
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-code-branch"></i>शर्त – उदाहरण 1</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 1</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      उम्र = 18
+      अगर उम्र >= 18:
+          छापें("वयस्क")
+      अन्यथा:
+          छापें("नाबालिग")
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>वयस्क</div>
+            <p><strong>व्याख्या:</strong> If-Else का साधारण उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-code-branch"></i>शर्त – उदाहरण 2</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 2</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      संख्या = 5
+      अगर संख्या % 2 == 0:
+          छापें("सम संख्या")
+      अन्यथा:
+          छापें("विषम संख्या")
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>विषम संख्या</div>
+            <p><strong>व्याख्या:</strong> Even-Odd चेक।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-code-branch"></i>शर्त – उदाहरण 3</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 3</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      अंक = 75
+      अगर अंक >= 90:
+          छापें("A ग्रेड")
+      अन्यथा_अगर अंक >= 60:
+          छापें("B ग्रेड")
+      अन्यथा:
+          छापें("C ग्रेड")
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>B ग्रेड</div>
+            <p><strong>व्याख्या:</strong> Nested if-else का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-code-branch"></i>शर्त – उदाहरण 4</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 4</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      लॉगिन = True
+      अगर लॉगिन:
+          छापें("वेलकम")
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>वेलकम</div>
+            <p><strong>व्याख्या:</strong> सिर्फ if का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-code-branch"></i>शर्त – उदाहरण 5</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 5</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      पासवर्ड = "1234"
+      अगर पासवर्ड == "1234":
+          छापें("सही पासवर्ड")
+      अन्यथा:
+          छापें("गलत पासवर्ड")
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>सही पासवर्ड</div>
+            <p><strong>व्याख्या:</strong> पासवर्ड चेक करने का उदाहरण।</p>
+          </div>
+        `
+      },
+
+      // 🔹 LOOPS (चक्र)
+      loops: {
+        icon: "fas fa-sync-alt",
+        content: `
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-sync-alt"></i>लूप – उदाहरण 1</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 1</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      नाम_सूची = ["राम","सीता","मोहन"]
+      के_लिए नाम नाम_सूची में:
+          छापें("नमस्ते", नाम)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>नमस्ते राम<br>नमस्ते सीता<br>नमस्ते मोहन</div>
+            <p><strong>व्याख्या:</strong> साधारण for loop।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-sync-alt"></i>लूप – उदाहरण 2</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 2</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      गिनती = 1
+      जबतक गिनती <= 5:
+          छापें("संख्या:", गिनती)
+          गिनती = गिनती + 1
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>संख्या: 1<br>संख्या: 2<br>संख्या: 3<br>संख्या: 4<br>संख्या: 5</div>
+            <p><strong>व्याख्या:</strong> while loop का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-sync-alt"></i>लूप – उदाहरण 3</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 3</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      के_लिए i [1,2,3,4,5] में:
+          अगर i == 3:
+              रोकें
+          छापें(i)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>1<br>2</div>
+            <p><strong>व्याख्या:</strong> break का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-sync-alt"></i>लूप – उदाहरण 4</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 4</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      के_लिए i [1,2,3,4,5] में:
+          अगर i == 3:
+              जारी_रखें
+          छापें(i)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>1<br>2<br>4<br>5</div>
+            <p><strong>व्याख्या:</strong> continue का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-sync-alt"></i>लूप – उदाहरण 5</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 5</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      के_लिए i [1,2,3] में:
+          के_लिए j [1,2] में:
+              छापें(i,"x",j)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>1 x 1<br>1 x 2<br>2 x 1<br>2 x 2<br>3 x 1<br>3 x 2</div>
+            <p><strong>व्याख्या:</strong> Nested loop।</p>
+          </div>
+        `
+      },
+
+      // 🔹 FUNCTIONS (प्रकार्य)
+      functions: {
+        icon: "fas fa-function",
+        content: `
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-function"></i>प्रकार्य – उदाहरण 1</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 1</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      प्रकार्य नमस्ते(नाम):
+          छापें("नमस्ते", नाम)
+
+      नमस्ते("राहुल")
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>नमस्ते राहुल</div>
+            <p><strong>व्याख्या:</strong> साधारण फ़ंक्शन।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-function"></i>प्रकार्य – उदाहरण 2</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 2</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      प्रकार्य जोड़(a, b):
+          वापस_करें a + b
+
+      परिणाम = जोड़(5, 7)
+      छापें("योग:", परिणाम)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>योग: 12</div>
+            <p><strong>व्याख्या:</strong> फ़ंक्शन से return।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-function"></i>प्रकार्य – उदाहरण 3</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 3</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      प्रकार्य वर्ग(x):
+          वापस_करें x * x
+
+      छापें("25 का वर्ग:", वर्ग(25))
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>25 का वर्ग: 625</div>
+            <p><strong>व्याख्या:</strong> फंक्शन में गणितीय लॉजिक।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-function"></i>प्रकार्य – उदाहरण 4</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 4</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      प्रकार्य संदेश():
+          छापें("स्वागत है!")
+
+      संदेश()
+      संदेश()
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>स्वागत है!<br>स्वागत है!</div>
+            <p><strong>व्याख्या:</strong> फंक्शन को कई बार कॉल किया।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-function"></i>प्रकार्य – उदाहरण 5</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण 5</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      प्रकार्य बड़ा(a, b):
+          अगर a > b:
+              वापस_करें a
+          अन्यथा:
+              वापस_करें b
+
+      छापें("बड़ा:", बड़ा(10, 20))
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>बड़ा: 20</div>
+            <p><strong>व्याख्या:</strong> Comparison करने वाला function।</p>
+          </div>
+        `
+      },
+
+      // 🔹 COLLECTIONS (संग्रह)
+      collections: {
+        icon: "fas fa-boxes",
+        content: `
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-layer-group"></i>संग्रह – सूची</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण </div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      फल = ["सेब","केला","आम"]
+      छापें(फल)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>["सेब","केला","आम"]</div>
+            <p><strong>व्याख्या:</strong> List का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-layer-group"></i>संग्रह – युग्म</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण </div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      बिंदु = (10,20)
+      छापें("X:", बिंदु[0])
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>X: 10</div>
+            <p><strong>व्याख्या:</strong> Tuple का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-layer-group"></i>संग्रह – समुच्चय</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण </div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      संख्या = {1,2,2,3}
+      छापें(संख्या)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>{1,2,3}</div>
+            <p><strong>व्याख्या:</strong> Set डुप्लीकेट हटाता है।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-layer-group"></i>संग्रह – शब्दकोश</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण </div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      विद्यार्थी = {"नाम":"रवि","उम्र":20}
+      छापें(विद्यार्थी["नाम"])
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>रवि</div>
+            <p><strong>व्याख्या:</strong> Dictionary key-value का उपयोग।</p>
+          </div>
+
+          <div class="card">
+            <h1 class="content-title"><i class="fas fa-layer-group"></i>संग्रह – नेस्टेड</h1>
+            <div class="code-container">
+              <div class="code-header">
+                  <div class="language-tag">उदाहरण </div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">
+                      <i class="fas fa-copy"></i>
+                      कॉपी
+                    </button>
+                  </div>
+              <pre><code>
+      डेटा = {
+        "कक्षा": "10",
+        "नाम": ["राम","श्याम"]
+      }
+      छापें(डेटा)
+              </code></pre>
+            </div>
+            <div class="output"><strong>Output:</strong><br>{"कक्षा":"10","नाम":["राम","श्याम"]}</div>
+            <p><strong>व्याख्या:</strong> Nested collection।</p>
+          </div>
+        `
+      },
+
+
+  oop: {
+    title: "ऑब्जेक्ट ओरिएंटेड प्रोग्रामिंग",
+    icon: "fas fa-user-astronaut",
+    content: `
+      <div class="content-card">
+        <h1 class="content-title"><i class="fas fa-user-astronaut"></i> ऑब्जेक्ट ओरिएंटेड प्रोग्रामिंग</h1>
+        <p class="content-subtitle">कक्षा (class) और वस्तु (object) से प्रोग्राम को वास्तविक दुनिया जैसा बनाया जाता है।</p>
+        
+        <pre><code>कक्षा विद्यार्थी:
+    प्रकार्य __init__(self, नाम):
+        self.नाम = नाम
+
+    प्रकार्य नमस्ते(self):
+        छापें("नमस्ते", self.नाम)
+
+obj = विद्यार्थी("आरव")
+obj.नमस्ते()</code></pre>
+        
+        <div class="output">नमस्ते आरव</div>
+      </div>
+      `
+      }
+    };
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      showContent('intro', document.querySelector('.sidebar-nav a.active'));
+    });
+
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const content = document.getElementById('content');
+      const toggleBtn = document.getElementById('toggleBtn');
+      
+      sidebar.classList.toggle('show');
+      content.classList.toggle('shifted');
+      
+      const icon = toggleBtn.querySelector('i');
+      if (sidebar.classList.contains('show')) {
+        icon.className = 'fas fa-times';
+      } else {
+        icon.className = 'fas fa-bars';
+      }
+    }
+
+    // Content display functionality
+    function showContent(topicKey, element) {
+      // Update active state
+      document.querySelectorAll('.sidebar-nav a').forEach(link => {
+        link.classList.remove('active');
+      });
+      element.classList.add('active');
+
+      // Update progress
+      const progress = element.getAttribute('data-progress');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      
+      progressBar.style.width = progress + '%';
+      progressText.textContent = progress + '%';
+
+      // Show content
+      const topic = topics[topicKey];
+      if (topic) {
+        document.getElementById('content').innerHTML = topic.content;
+      } else {
+        document.getElementById('content').innerHTML = `
+          <div class="content-card">
+            <h1 class="content-title">
+              <i class="fas fa-construction"></i>
+              जल्द आ रहा है...
+            </h1>
+            <p class="content-subtitle">
+              यह सेक्शन अभी तैयार किया जा रहा है। कृपया बाद में वापस आएं।
+            </p>
+          </div>
+        `;
+      }
+
+      // Close sidebar on mobile after selection
+      if (window.innerWidth <= 992) {
+        toggleSidebar();
+      }
+    }
+
+    // Interactive demo functionality
+    function showInteractiveDemo() {
+      // This would show an interactive code runner
+      alert('🚀 इंटरैक्टिव डेमो जल्द ही उपलब्ध होगा! अभी के लिए "खुद आज़माएं" बटन दबाएं।');
+    }
+
+    // Copy to clipboard functionality
+    function copyToClipboard(button) {
+      const codeBlock = button.closest('.code-container').querySelector('code');
+      const text = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> कॉपी हो गया!';
+        button.style.background = 'rgba(16, 185, 129, 0.2)';
+        
+        setTimeout(() => {
+          button.innerHTML = originalContent;
+          button.style.background = '';
+        }, 2000);
+      }).catch(() => {
+        alert('कॉपी नहीं हो सका। कृपया मैन्युअल रूप से कॉपी करें।');
+      });
+    }
+
+
+    // Responsive sidebar handling
+    window.addEventListener('resize', function() {
+      const sidebar = document.getElementById('sidebar');
+      const content = document.getElementById('content');
+      
+      if (window.innerWidth > 992) {
+        // Desktop view - keep sidebar state
+      } else {
+        // Mobile view - always close sidebar
+        if (sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+          content.classList.remove('shifted');
+          document.getElementById('toggleBtn').querySelector('i').className = 'fas fa-bars';
+        }
+      }
+    });
+
+  function redirectToEditor() {
+    if (isLoggedIn) {
+      // ✅ Already logged in → open editor in new tab
+      window.open("/runner", "_blank");
+    } else {
+      // ❌ Not logged in → send to login page
+      alert("कृपया पहले लॉगिन करें!");
+      window.location.href = "/login";
+    }
+  }
+
+  </script>
+</body>
+</html> 

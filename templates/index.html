@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <title>🧪 हिंदी कोड रनर</title>
+  
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-darker.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #f0f2f5;
+      --text-color: #333;
+      --box-bg: #ffffff;
+      --button-bg: #007bff;
+      --button-hover: #0056b3;
+      --pre-bg: #ffffff;
+      --pre-text: #000000;
+      --exp-bg: #f4f4f4;
+      --border-color: #e0e0e0;
+      --keyboard-bg: #ffffff;
+      --key-bg: #f8f9fa;
+      --key-hover: #e9ecef;
+      --key-active: #007bff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --tab-active: #007bff;
+      --error-color: #e74c3c;
+      --success-color: #27ae60;
+    }
+
+    body.dark {
+      --bg-color: #121212;
+      --text-color: #eeeeee;
+      --box-bg: #1e1e1e;
+      --button-bg: #2563eb;
+      --button-hover: #1d4ed8;
+      --pre-bg: #2c2c2c;
+      --pre-text: #f8f8f8;
+      --exp-bg: #2e2e2e;
+      --border-color: #404040;
+      --keyboard-bg: #1e1e1e;
+      --key-bg: #2a2a2a;
+      --key-hover: #3a3a3a;
+      --key-active: #2563eb;
+      --shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      padding: 20px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: var(--box-bg);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      transition: background 0.3s ease;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .toggle-theme {
+      background: var(--key-bg);
+      border: 1px solid var(--border-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      padding: 10px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-theme:hover {
+      background: var(--key-hover);
+      transform: scale(1.1);
+    }
+
+    .keyboard-toggle {
+      background: var(--key-bg);
+      border: 1px solid var(--border-color);
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .keyboard-toggle:hover {
+      background: var(--key-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .keyboard-toggle.active {
+      background: var(--button-bg);
+      color: white;
+    }
+
+    /* Main Tab System */
+    .main-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      background: var(--box-bg);
+      border-radius: 12px;
+      padding: 5px;
+      box-shadow: var(--shadow);
+    }
+
+    .main-tab {
+      flex: 1;
+      padding: 15px 25px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      color: var(--text-color);
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .main-tab:hover {
+      background: var(--key-hover);
+      transform: translateY(-2px);
+    }
+
+    .main-tab.active {
+      background: var(--tab-active);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Code Editor Section */
+    .editor-container {
+      background: var(--box-bg);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .editor-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .editor-tools {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .editor-output-wrapper {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .editor-container,
+    .output-section {
+      flex: 1;
+      min-width: 0; /* for flexbox shrink */
+    }
+
+    .output-section.side-by-side {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+
+    .tool-btn {
+      padding: 8px 15px;
+      border: 1px solid var(--border-color);
+      background: var(--key-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .tool-btn:hover {
+      background: var(--key-hover);
+      transform: translateY(-1px);
+    }
+
+    /* CodeMirror customization */
+    .CodeMirror {
+      height: 300px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    body.dark .CodeMirror {
+      background: #2a2a2a;
+      color: #f1f1f1;
+    }
+
+    .CodeMirror-focused {
+      border-color: var(--button-bg);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .output-section {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .output-box, .explanation-box {
+      flex: 1;
+      background: var(--box-bg);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+      border: 1px solid var(--border-color);
+    }
+
+    .output-box h3, .explanation-box h3 {
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output-pre, .explanation-pre {
+      background: var(--pre-bg);
+      color: var(--pre-text);
+      padding: 20px;
+      border-radius: 10px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 15px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow: visible;
+      min-height: 200px;
+      margin: 0;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+      line-height: 1.4;
+    }
+
+    .explanation-pre {
+      background: var(--exp-bg);
+      color: var(--text-color);
+    }
+
+    /* Error styling */
+    .error-output {
+      color: var(--error-color) !important;
+      border-left: 4px solid var(--error-color);
+    }
+
+    .success-output {
+      color: var(--success-color) !important;
+      border-left: 4px solid var(--success-color);
+    }
+
+    /* Documentation Section */
+    .docs-container {
+      background: var(--box-bg);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      border: 1px solid var(--border-color);
+    }
+
+    .docs-tabs {
+      display: flex;
+      margin-bottom: 25px;
+      background: var(--exp-bg);
+      border-radius: 8px;
+      padding: 5px;
+    }
+
+    .docs-tab {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      color: var(--text-color);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .docs-tab.active {
+      background: var(--button-bg);
+      color: white;
+    }
+
+    .docs-section {
+      margin-bottom: 25px;
+    }
+
+    .docs-section h3 {
+      color: var(--button-bg);
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+      border-left: 4px solid var(--button-bg);
+      padding-left: 15px;
+    }
+
+    .keyword-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background: var(--exp-bg);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .keyword-table th, .keyword-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .keyword-table th {
+      background: var(--button-bg);
+      color: white;
+      font-weight: 600;
+    }
+
+    .keyword-table tr:hover {
+      background: var(--key-hover);
+    }
+
+    .hindi-keyword {
+      font-weight: bold;
+      color: #e74c3c;
+      font-family: 'Noto Sans Devanagari', sans-serif;
+    }
+
+    .python-keyword {
+      font-weight: bold;
+      color: #3498db;
+      font-family: 'Consolas', monospace;
+      background: var(--pre-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .example-code {
+      background: var(--pre-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      font-family: 'Consolas', monospace;
+      overflow-x: auto;
+    }
+
+    /* Run button styling */
+    .run-button {
+      margin-top: 20px;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--button-bg) 0%, var(--button-hover) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .run-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    }
+
+    .run-button.loading {
+      pointer-events: none;
+    }
+
+    .run-button.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Virtual Keyboard Styles */
+    .virtual-keyboard {
+      position: fixed;
+      bottom: -100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 900px;
+      max-height: 60vh;
+      background: var(--keyboard-bg);
+      border-radius: 15px 15px 0 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+      padding: 20px;
+      transition: bottom 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      z-index: 1000;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      overflow-y: auto;
+    }
+
+    .virtual-keyboard.active {
+      bottom: 0;
+    }
+
+    .keyboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .keyboard-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .keyboard-close {
+      background: #ff4757;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin: 0;
+      transition: all 0.3s ease;
+    }
+
+    .keyboard-close:hover {
+      background: #ff3742;
+      transform: scale(1.1);
+    }
+
+    .keyboard-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .keyboard-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .key {
+      background: var(--key-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      color: var(--text-color);
+      min-width: 40px;
+      text-align: center;
+      user-select: none;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .key:hover {
+      background: var(--key-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .key:active {
+      background: var(--key-active);
+      color: white;
+      transform: translateY(0);
+    }
+
+    .key.space {
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .key.enter {
+      background: var(--button-bg);
+      color: white;
+      min-width: 80px;
+    }
+
+    .key.backspace {
+      background: #ff6b6b;
+      color: white;
+      min-width: 80px;
+    }
+
+    .keyboard-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.05);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .keyboard-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Enhanced animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .main-tabs {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .output-section {
+        flex-direction: column;
+      }
+      
+      .editor-tools {
+        flex-wrap: wrap;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      .header-controls {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      .editor-container, .docs-container {
+        padding: 20px;
+      }
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>CodeMorph(HindCode) – Interactive Hindi Code Language</h1>
+    <div class="header-controls">
+      <button class="keyboard-toggle" id="keyboardToggle" aria-label="Toggle Hindi Keyboard">
+        ⌨️ हिंदी
+      </button>
+      <button class="toggle-theme" id="themeToggle" aria-label="Toggle Theme">🌙</button>
+    </div>
+  </div>
+
+  <!-- Main Tabs -->
+  <div class="main-tabs">
+    <button class="main-tab active" data-tab="editor">📝 कोड एडिटर</button>
+    <button class="main-tab" data-tab="docs">📖 डॉक्यूमेंटेशन</button>
+  </div>
+
+  <div class="container-fluid bg-dark text-white py-2">
+  <div class="d-flex justify-content-between align-items-center">
+    <h4 class="m-0">💻 हिंदी कोड संपादक</h4><br>
+    <div class="d-flex gap-3">
+      <a href="/" class="tool-btn btn-outline-info px-2">
+      Home
+      </a>
+      <a href="/logout" class="tool-btn btn-danger px-2">
+      Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Code Editor Tab -->
+  <!-- Code + Output side by side -->
+  <div id="editor" class="tab-content active">
+    <div class="editor-output-wrapper tab-content">
+      <!-- Left: Editor -->
+      <div class="editor-container">
+        <div class="editor-header">
+          <div class="editor-title">
+            💻 हिंदी कोड लिखें
+          </div>
+          <div class="editor-tools">
+            <button class="tool-btn" onclick="loadExample()">📝 उदाहरण लोड करें</button>
+            <button class="tool-btn" onclick="clearCode()">🗑️ साफ़ करें</button>
+            <button class="tool-btn" id="voiceBtn">🎤 वॉइस टाइपिंग</button>
+          </div>
+        </div>
+        <textarea id="code" placeholder="यहां अपना हिंदी कोड लिखें...
+    उदाहरण:
+    छापें('नमस्ते दुनिया!')"></textarea>
+        <button class="run-button" onclick="runCode()" id="runButton">
+          ▶️ कोड चलाएँ
+        </button>
+      </div>
+
+      <!-- Right: Output -->
+      <div class="output-section side-by-side">
+        <div class="output-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>📤 आउटपुट</h3>
+            <button class="tool-btn" onclick="toggleTranslation()">🌐 Translate</button>
+          </div>
+          <pre class="output-pre" id="output">यहां आपके कोड का परिणाम दिखेगा...</pre>
+        </div>
+        <div class="explanation-box">
+          <h3>💬 कोड व्याख्या</h3>
+          <pre class="explanation-pre" id="explanation">यहां आपके कोड की व्याख्या होगी...</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Documentation Tab -->
+  <div class="tab-content" id="docs">
+    <div class="docs-container">
+      <h2>📖 हिंदी प्रोग्रामिंग डॉक्यूमेंटेशन</h2>
+      
+      <div class="docs-tabs">
+        <button class="docs-tab active" data-docs-tab="keywords">कीवर्ड्स</button>
+        <button class="docs-tab" data-docs-tab="syntax">सिंटैक्स</button>
+        <button class="docs-tab" data-docs-tab="examples">उदाहरण</button>
+        <button class="docs-tab" data-docs-tab="errors">एरर गाइड</button>
+      </div>
+
+      <!-- Keywords Tab -->
+      <div class="docs-content active" id="keywords">
+        <div class="docs-section">
+          <h3>🔤 मुख्य कीवर्ड्स</h3>
+          <table class="keyword-table">
+            <thead>
+              <tr>
+                <th>हिंदी कीवर्ड</th>
+                <th>Python कीवर्ड</th>
+                <th>उपयोग</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="hindi-keyword">छापें</td><td class="python-keyword">print</td><td>आउटपुट दिखाना</td></tr>
+              <tr><td class="hindi-keyword">परिभाषित</td><td class="python-keyword">def</td><td>फंक्शन परिभाषित करना</td></tr>
+              <tr><td class="hindi-keyword">वापस_करें</td><td class="python-keyword">return</td><td>वैल्यू वापस करना</td></tr>
+              <tr><td class="hindi-keyword">अगर</td><td class="python-keyword">if</td><td>शर्त लगाना</td></tr>
+              <tr><td class="hindi-keyword">अन्यथा</td><td class="python-keyword">else</td><td>वैकल्पिक शर्त</td></tr>
+              <tr><td class="hindi-keyword">के_लिए</td><td class="python-keyword">for</td><td>फॉर लूप चलाना</td></tr>
+              <tr><td class="hindi-keyword">जबतक</td><td class="python-keyword">while</td><td>वाइल लूप चलाना</td></tr>
+              <tr><td class="hindi-keyword">इनपुट</td><td class="python-keyword">input</td><td>यूजर से इनपुट लेना</td></tr>
+              <tr><td class="hindi-keyword">में</td><td class="python-keyword">in</td><td>सदस्यता जांचना</td></tr>
+              <tr><td class="hindi-keyword">सीमा</td><td class="python-keyword">range</td><td>संख्या की सीमा बनाना</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-section">
+          <h3>🔢 डेटा टाइप्स</h3>
+          <table class="keyword-table">
+            <thead>
+              <tr>
+                <th>हिंदी</th>
+                <th>Python</th>
+                <th>उदाहरण</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="hindi-keyword">संख्या</td><td class="python-keyword">int</td><td>१२३, -४५</td></tr>
+              <tr><td class="hindi-keyword">पाठ</td><td class="python-keyword">str</td><td>"नमस्ते"</td></tr>
+              <tr><td class="hindi-keyword">सही</td><td class="python-keyword">True</td><td>सत्य मान</td></tr>
+              <tr><td class="hindi-keyword">गलत</td><td class="python-keyword">False</td><td>असत्य मान</td></tr>
+              <tr><td class="hindi-keyword">सूची</td><td class="python-keyword">list</td><td>[१, २, ३]</td></tr>
+              <tr><td class="hindi-keyword">टपल</td><td class="python-keyword">tuple</td><td>(१, २, ३)</td></tr>
+              <tr><td class="hindi-keyword">शब्दकोश</td><td class="python-keyword">dict</td><td>{'सेब': 100, 'केला': 40, 'संतरा': 60}</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="docs-section">
+          <h3>OOPS</h3>
+          <table class="keyword-table">
+            <thead>
+              <tr>
+                <th>हिंदी</th>
+                <th>Python</th>
+                <th>उदाहरण</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="hindi-keyword">स्व</td><td class="python-keyword">self</td><td>किसी class के अंदर object को reference करने के लिए</td></tr>
+              <tr><td class="hindi-keyword">आरंभ</td><td class="python-keyword">_init_</td><td>Constructor method, object बनते समय चलता है</td></tr>
+              <tr><td class="hindi-keyword">वर्ग</td><td class="python-keyword">class</td><td>नया class define करने के लिए</td></tr>
+              <tr><td class="hindi-keyword">वस्तु</td><td class="python-keyword">object</td><td>किसी class से बनाए गए instance को दर्शाता है</td></tr>
+              <tr><td class="hindi-keyword">नया</td><td class="python-keyword">new</td><td>नया object allocate करने के लिए</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Syntax Tab -->
+      <div class="docs-content" id="syntax">
+        <div class="docs-section">
+          <h3>📝 मूल सिंटैक्स</h3>
+          
+          <h4>1. वेरिएबल बनाना:</h4>
+          <div class="example-code">नाम = "राहुल"
+उम्र = २५
+वेतन = ५०००.५०</div>
+
+          <h4>2. शर्तें लगाना:</h4>
+          <div class="example-code">अगर उम्र >= १८:
+    छापें("आप व्यस्क हैं")
+अन्यथा:
+    छापें("आप नाबालिग हैं")</div>
+
+          <h4>3. लूप चलाना:</h4>
+          <div class="example-code">के_लिए i में सीमा(५):
+    छापें(i)
+
+संख्या = ०
+जबतक संख्या < ५:
+    छापें(संख्या)
+    संख्या = संख्या + १</div>
+
+          <h4>4. फंक्शन बनाना:</h4>
+          <div class="example-code">परिभाषित जोड़ना(क, ख):
+    परिणाम = क + ख
+    वापस_करें परिणाम
+
+उत्तर = जोड़ना(५, ३)
+छापें(उत्तर)</div>
+        </div>
+      </div>
+
+      <!-- Examples Tab -->
+      <div class="docs-content" id="examples">
+        <div class="docs-section">
+          <h3>💡 कोड उदाहरण</h3>
+          
+          <h4>उदाहरण 1: सरल गणना</h4>
+          <div class="example-code" onclick="loadSpecificExample(1)">क = १०
+ख = २०
+योग = क + ख
+छापें("योग है:", योग)</div>
+
+          <h4>उदाहरण 2: ग्रेड कैलकुलेटर</h4>
+          <div class="example-code" onclick="loadSpecificExample(2)">अंक = ८५
+
+अगर अंक >= ९०:
+    छापें("ग्रेड: A+")
+अन्यथा अगर अंक >= ८०:
+    छापें("ग्रेड: A")
+अन्यथा:
+    छापें("ग्रेड: C")</div>
+
+          <h4>उदाहरण 3: पहाड़ा प्रिंट करना</h4>
+          <div class="example-code" onclick="loadSpecificExample(3)">संख्या = ५
+के_लिए i में सीमा(१, ११):
+    परिणाम = संख्या * i
+    छापें(संख्या, "×", i, "=", परिणाम)</div>
+        </div>
+      </div>
+
+          <h4>उदाहरण 4: OOPS </h4>
+          <div class="example-code" onclick="loadSpecificExample(4)"> वर्ग विद्यार्थी(वस्तु):
+    परिभाषित आरंभ(स्व, नाम, उम्र):
+        स्व.नाम = नाम
+        स्व.उम्र = उम्र
+
+    परिभाषित विवरण_दिखाएँ(स्व):
+        छापें("👤 नाम:", स्व.नाम)
+        छापें("🎂 उम्र:", स्व.उम्र)
+
+# ऑब्जेक्ट बनाना
+विद्यार्थी1 = विद्यार्थी("राहुल", २०)
+विद्यार्थी2 = विद्यार्थी("सीमा", २२)
+
+# मेथड कॉल करना
+विद्यार्थी1.विवरण_दिखाएँ()
+विद्यार्थी2.विवरण_दिखाएँ()
+      </div>
+        </div>
+      </div>
+
+      <!-- Error Guide Tab -->
+      <div class="tab-content" id="errors">
+        <div class="docs-section">
+          <h3>🚨 सामान्य एरर और समाधान</h3>
+          
+          <h4>1. SyntaxError (सिंटैक्स एरर)</h4>
+          <div class="example-code">❌ गलत: छापें("हैलो"
+✅ सही: छापें("हैलो")</div>
+          <p><strong>समाधान:</strong> ब्रैकेट्स को सही तरीके से बंद करें।</p>
+
+          <h4>2. NameError (नाम एरर)</h4>
+          <div class="example-code">❌ गलत: छापें(नाम)  # नाम परिभाषित नहीं है
+✅ सही: नाम = "राहुल"
+      छापें(नाम)</div>
+          <p><strong>समाधान:</strong> वेरिएबल को उपयोग से पहले परिभाषित करें।</p>
+
+          <h4>3. IndentationError (इंडेंटेशन एरर)</h4>
+          <div class="example-code">❌ गलत: अगर सही:
+छापें("हैलो")
+
+✅ सही: अगर सही:
+    छापें("हैलो")</div>
+          <p><strong>समाधान:</strong> कोड ब्लॉक्स में सही इंडेंटेशन (4 स्पेस) का उपयोग करें।</p>
+
+          <h4>4. ZeroDivisionError (शून्य भाग एरर)</h4>
+          <div class="example-code">❌ गलत: परिणाम = १० / ०
+✅ सही: अगर ख != ०:
+          परिणाम = क / ख
+      अन्यथा:
+          छापें("शून्य से भाग नहीं हो सकता")</div>
+          <p><strong>समाधान:</strong> शून्य से भाग देने से बचें।</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Overlay -->
+  <div class="keyboard-overlay" id="keyboardOverlay"></div>
+
+  <!-- Virtual Hindi Keyboard -->
+  <div class="virtual-keyboard" id="virtualKeyboard">
+    <div class="keyboard-header">
+      <span class="keyboard-title">🇮🇳 हिंदी वर्चुअल कीबोर्ड</span>
+      <button class="keyboard-close" id="keyboardClose">×</button>
+    </div>
+    <div class="keyboard-rows">
+      <!-- Numbers Row -->
+      <div class="keyboard-row">
+        <div class="key" data-key="१">१</div>
+        <div class="key" data-key="२">२</div>
+        <div class="key" data-key="३">३</div>
+        <div class="key" data-key="४">४</div>
+        <div class="key" data-key="५">५</div>
+        <div class="key" data-key="६">६</div>
+        <div class="key" data-key="७">७</div>
+        <div class="key" data-key="८">८</div>
+        <div class="key" data-key="९">९</div>
+        <div class="key" data-key="०">०</div>
+        <div class="key backspace" data-key="backspace">⌫</div>
+      </div>
+      
+      <!-- All Swars (Vowels) -->
+      <div class="keyboard-row">
+        <div class="key" data-key="अ">अ</div>
+        <div class="key" data-key="आ">आ</div>
+        <div class="key" data-key="इ">इ</div>
+        <div class="key" data-key="ई">ई</div>
+        <div class="key" data-key="उ">उ</div>
+        <div class="key" data-key="ऊ">ऊ</div>
+        <div class="key" data-key="ऋ">ऋ</div>
+        <div class="key" data-key="ए">ए</div>
+        <div class="key" data-key="ऐ">ऐ</div>
+        <div class="key" data-key="ओ">ओ</div>
+        <div class="key" data-key="औ">औ</div>
+      </div>
+      
+      <!-- Matras for Swars -->
+      <div class="keyboard-row">
+        <div class="key" data-key="्">्</div>
+        <div class="key" data-key="ा">ा</div>
+        <div class="key" data-key="ि">ि</div>
+        <div class="key" data-key="ी">ी</div>
+        <div class="key" data-key="ु">ु</div>
+        <div class="key" data-key="ू">ू</div>
+        <div class="key" data-key="ृ">ृ</div>
+        <div class="key" data-key="े">े</div>
+        <div class="key" data-key="ै">ै</div>
+        <div class="key" data-key="ो">ो</div>
+        <div class="key" data-key="ौ">ौ</div>
+        <div class="key" data-key="ं">ं</div>
+      </div>
+
+      <!-- Ka-varga (क वर्ग) -->
+      <div class="keyboard-row">
+        <div class="key" data-key="क">क</div>
+        <div class="key" data-key="ख">ख</div>
+        <div class="key" data-key="ग">ग</div>
+        <div class="key" data-key="घ">घ</div>
+        <div class="key" data-key="ङ">ङ</div>
+        <!-- Cha-varga (च वर्ग) -->
+        <div class="key" data-key="च">च</div>
+        <div class="key" data-key="छ">छ</div>
+        <div class="key" data-key="ज">ज</div>
+        <div class="key" data-key="झ">झ</div>
+        <div class="key" data-key="ञ">ञ</div>
+      </div>
+      
+      <!-- Ta-varga (ट वर्ग) -->
+      <div class="keyboard-row">
+        <div class="key" data-key="ट">ट</div>
+        <div class="key" data-key="ठ">ठ</div>
+        <div class="key" data-key="ड">ड</div>
+        <div class="key" data-key="ढ">ढ</div>
+        <div class="key" data-key="ण">ण</div>
+        <!-- Ta-varga (त वर्ग) -->
+        <div class="key" data-key="त">त</div>
+        <div class="key" data-key="थ">थ</div>
+        <div class="key" data-key="द">द</div>
+        <div class="key" data-key="ध">ध</div>
+        <div class="key" data-key="न">न</div>
+      </div>
+      
+      <!-- Pa-varga (प वर्ग) -->
+      <div class="keyboard-row">
+        <div class="key" data-key="प">प</div>
+        <div class="key" data-key="फ">फ</div>
+        <div class="key" data-key="ब">ब</div>
+        <div class="key" data-key="भ">भ</div>
+        <div class="key" data-key="म">म</div>
+        <!-- Additional consonants -->
+        <div class="key" data-key="य">य</div>
+        <div class="key" data-key="र">र</div>
+        <div class="key" data-key="ल">ल</div>
+        <div class="key" data-key="व">व</div>
+        <div class="key" data-key="श">श</div>
+      </div>
+      
+      <!-- Remaining consonants and special characters -->
+      <div class="keyboard-row">
+        <div class="key" data-key="ष">ष</div>
+        <div class="key" data-key="स">स</div>
+        <div class="key" data-key="ह">ह</div>
+        <div class="key" data-key="क्ष">क्ष</div>
+        <div class="key" data-key="त्र">त्र</div>
+        <div class="key" data-key="ज्ञ">ज्ञ</div>
+        <div class="key" data-key="श्र">श्र</div>
+        <div class="key" data-key="ँ">ँ</div>
+        <div class="key" data-key="ः">ः</div>
+        <div class="key" data-key="़">़</div>
+      </div>
+      
+      <!-- Punctuation and function keys -->
+      <div class="keyboard-row">
+        <div class="key" data-key="।">।</div>
+        <div class="key" data-key="॥">॥</div>
+        <div class="key" data-key=",">,</div>
+        <div class="key" data-key=".">.</div>
+        <div class="key" data-key="'">'</div>
+        <div class="key" data-key="@">@</div>
+        <div class="key" data-key="!">!</div>
+        <div class="key" data-key="#">#</div>
+        <div class="key" data-key="$">$</div>
+        <div class="key" data-key="%">%</div>
+        <div class="key" data-key="*">*</div>
+        <div class="key" data-key="(">(</div>
+        <div class="key" data-key=")">)</div>
+      </div>
+      <div class="keyboard-row">
+        <div class="key" data-key="-">-</div>
+        <div class="key" data-key="+">+</div>
+        <div class="key" data-key="=">=</div>
+        <div class="key" data-key="{">{</div>
+        <div class="key" data-key="}">}</div>
+        <div class="key" data-key="[">[</div>
+        <div class="key" data-key="]">]</div> 
+        <div class="key" data-key=":">:</div>
+        <div class="key" data-key=";">;</div>
+        <div class="key" data-key="/">/</div>
+        <div class="key space" data-key="space">Space</div>
+        <div class="key enter" data-key="enter">Enter</div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <!-- CodeMirror Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+
+  <!-- External Scripts -->
+  <script src="/static/script.js"></script>
+
+  <script>
+
+    // Initialize CodeMirror
+    let editor;
+    document.addEventListener('DOMContentLoaded', function() {
+      const textarea = document.getElementById('code');
+      editor = CodeMirror.fromTextArea(textarea, {
+        mode: 'python',
+        // theme: body.classList.contains('dark') ? 'material-darker' : 'default',
+        lineNumbers: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        indentUnit: 4,
+        lineWrapping: true,
+        fontSize: '16px'
+      });
+
+    // Theme toggle functionality
+    const toggleBtn = document.getElementById("themeToggle");
+    const body = document.body;
+
+    function setTheme(mode) {
+      if (mode === "dark") {
+        body.classList.add("dark");
+        toggleBtn.textContent = "🌞";
+        if (window.editor) {
+          editor.setOption("theme", "material-darker");
+        }
+      } else {
+        body.classList.remove("dark");
+        toggleBtn.textContent = "🌙";
+        if (window.editor) {
+          editor.setOption("theme", "default");
+        }
+      }
+      localStorage.setItem("theme", mode);
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const isDark = body.classList.contains("dark");
+      setTheme(isDark ? "light" : "dark");
+    });
+
+    // Load saved theme
+    const saved = localStorage.getItem("theme") || "light";
+    setTheme(saved);
+      
+      // Store editor globally
+      window.editor = editor;
+      
+      // Sync theme with editor
+      if (body.classList.contains('dark')) {
+        editor.setOption("theme", "material-darker");
+      }
+    });
+
+    // Main tab functionality
+    document.querySelectorAll('.main-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+        
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and target content
+        tab.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+        
+        // Refresh CodeMirror when switching to editor tab
+        if (targetTab === 'editor' && window.editor) {
+          setTimeout(() => window.editor.refresh(), 100);
+        }
+      });
+    });
+
+    // Documentation tabs functionality
+    document.querySelectorAll('.docs-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.docsTab;
+        
+        // Remove active class from all docs tabs and contents
+        document.querySelectorAll('.docs-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.docs-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and target content
+        tab.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+      });
+    });
+
+    // Virtual Keyboard functionality
+    const keyboardToggle = document.getElementById("keyboardToggle");
+    const virtualKeyboard = document.getElementById("virtualKeyboard");
+    const keyboardOverlay = document.getElementById("keyboardOverlay");
+    const keyboardClose = document.getElementById("keyboardClose");
+
+    function toggleKeyboard() {
+      const isActive = virtualKeyboard.classList.contains("active");
+      if (isActive) {
+        virtualKeyboard.classList.remove("active");
+        keyboardOverlay.classList.remove("active");
+        keyboardToggle.classList.remove("active");
+        keyboardToggle.innerHTML = "⌨️ हिंदी";
+      } else {
+        virtualKeyboard.classList.add("active");
+        keyboardOverlay.classList.add("active");
+        keyboardToggle.classList.add("active");
+        keyboardToggle.innerHTML = "⌨️ बंद करें";
+      }
+    }
+
+    keyboardToggle.addEventListener("click", toggleKeyboard);
+    keyboardClose.addEventListener("click", toggleKeyboard);
+    keyboardOverlay.addEventListener("click", toggleKeyboard);
+
+    // Key click functionality
+    document.querySelectorAll(".key").forEach(key => {
+      key.addEventListener("click", () => {
+        const keyValue = key.dataset.key;
+        
+        if (window.editor) {
+          const doc = editor.getDoc();
+          const cursor = doc.getCursor();
+          
+          if (keyValue === "backspace") {
+            if (cursor.ch > 0 || cursor.line > 0) {
+              doc.replaceRange("", {line: cursor.line, ch: cursor.ch - 1}, cursor);
+            }
+          } else if (keyValue === "enter") {
+            doc.replaceRange("\n", cursor);
+          } else if (keyValue === "space") {
+            doc.replaceRange(" ", cursor);
+          } else {
+            doc.replaceRange(keyValue, cursor);
+          }
+          
+          editor.focus();
+        }
+        
+        // Add visual feedback
+        key.style.transform = "scale(0.95)";
+        setTimeout(() => {
+          key.style.transform = "";
+        }, 150);
+      });
+    });
+
+    // --- Voice Typing ---
+let recognizing=false;
+let recognition;
+document.getElementById('voiceBtn').addEventListener('click',()=>{
+  if(!('webkitSpeechRecognition' in window)){alert('वॉइस टाइपिंग ब्राउज़र में समर्थित नहीं है');return;}
+  if(!recognition){
+    recognition=new webkitSpeechRecognition();
+    recognition.continuous=false;
+    recognition.interimResults=false;
+    recognition.lang='hi-IN';
+    recognition.onresult=e=>{
+      let transcript=e.results[0][0].transcript.trim();
+      insertVoiceCode(transcript);
+    };
+    recognition.onend=()=>{recognizing=false;document.getElementById('voiceBtn').textContent='🎤 वॉइस टाइपिंग';};
+  }
+  if(!recognizing){recognition.start();recognizing=true;document.getElementById('voiceBtn').textContent='🔴 रिकॉर्डिंग…';}
+  else{recognition.stop();recognizing=false;document.getElementById('voiceBtn').textContent='🎤 वॉइस टाइपिंग';}
+});
+function insertVoiceCode(text){
+  text = text.replace(/[\p{P}\p{S}]/gu, ''); // remove punctuation & symbols
+  const words = text.trim().split(/\s+/);
+  let line = "";
+  words.forEach(w => { line += w + " "; });
+  const cm = editor;
+  const cursor = cm.getCursor();
+  cm.replaceRange(line, cursor);
+  cm.focus();
+}
+
+
+    function displaySuccess(output, explanation) {
+      const outputElement = document.getElementById('output');
+      const explanationElement = document.getElementById('explanation');
+      
+      // Add success styling
+      outputElement.className = 'output-pre success-output';
+      outputElement.textContent = output;
+      
+      explanationElement.textContent = explanation;
+    }
+
+    // Example loading functions
+    function loadExample() {
+      if (!editor) {
+        console.warn('Editor not initialized yet');
+        return;
+      }
+      
+      const examples = [
+        `छापें('नमस्ते सरजी!')
+नाम = 'यश'
+उम्र = २५
+छापें('मेरा नाम', नाम, 'है और मैं', उम्र, 'साल का हूं')`,
+
+        `# गणित के उदाहरण
+क = १०
+ख = २०
+योग = क + ख
+छापें('योग:', योग)
+
+अगर योग > २५:
+    छापें('योग २५ से अधिक है')
+अन्यथा:
+    छापें('योग २५ से कम है')`,
+
+        `# लूप का उदाहरण  
+के_लिए संख्या में सीमा(१, ६):
+    छापें('संख्या:', संख्या)
+
+गिनती = ०
+जबतक गिनती < ३:
+    छापें('गिनती:', गिनती)
+    गिनती = गिनती + १`,
+        
+
+        `#
+वर्ग विद्यार्थी(वस्तु):
+    परिभाषित आरंभ(स्व, नाम, उम्र):
+        स्व.नाम = नाम
+        स्व.उम्र = उम्र
+
+    परिभाषित विवरण_दिखाएँ(स्व):
+        छापें("👤 नाम:", स्व.नाम)
+        छापें("🎂 उम्र:", स्व.उम्र)
+
+# ऑब्जेक्ट बनाना
+विद्यार्थी1 = विद्यार्थी("राहुल", २०)
+विद्यार्थी2 = विद्यार्थी("सीमा", २२)
+
+# मेथड कॉल करना
+विद्यार्थी1.विवरण_दिखाएँ()
+विद्यार्थी2.विवरण_दिखाएँ()`
+    ];
+      
+      const randomExample = examples[Math.floor(Math.random() * examples.length)];
+      editor.setValue(randomExample);
+    }
+
+    function loadSpecificExample(num) {
+      if (!editor) {
+        console.warn('Editor not initialized yet');
+        return;
+      }
+      
+      const examples = {
+        1: `क = १०
+ख = २०
+योग = क + ख
+छापें("योग है:", योग)`,
+        2: `अंक = ८५
+
+अगर अंक >= ९०:
+    छापें("ग्रेड: A+")
+अन्यथा अगर अंक >= ८०:
+    छापें("ग्रेड: A")
+अन्यथा:
+    छापें("ग्रेड: C")`,
+        3: `संख्या = ५
+के_लिए i में सीमा(१, ११):
+    परिणाम = संख्या * i
+    छापें(संख्या, "×", i, "=", परिणाम)`
+      };
+      
+      if (examples[num]) {
+        editor.setValue(examples[num]);
+        // Switch to editor tab
+        document.querySelector('.main-tab[data-tab="editor"]').click();
+      }
+    }
+
+    function clearCode() {
+      if (!editor) {
+        console.warn('Editor not initialized yet');
+        return;
+      }
+      
+      editor.setValue('');
+      document.getElementById('output').textContent = 'यहां आपके कोड का परिणाम दिखेगा...';
+      document.getElementById('explanation').textContent = 'यहां आपके कोड की व्याख्या होगी...';
+      document.getElementById('output').className = 'output-pre';
+    }
+
+    // Enhanced runCode function (this will be overridden by your script.js)
+    function runCode() {
+  // Check if external script loaded successfully
+    if (typeof window.externalRunCode === 'function') {
+    window.externalRunCode();
+    } else {
+    // Fallback if external script failed to load
+    const runButton = document.getElementById("runButton");
+    runButton.classList.add("loading");
+    runButton.innerHTML = "⏳ चल रहा है...";
+    
+    setTimeout(() => {
+      displayError('❌ स्क्रिप्ट लोड नहीं हुई', 'कृपया /static/script.js फाइल चेक करें');
+      runButton.classList.remove("loading");
+      runButton.innerHTML = "▶️ कोड चलाएँ";
+        }, 500);
+        }
+        
+
+      // Call your original runCode function if it exists in script.js
+      if (typeof window.runCode === 'function') {
+        window.originalRunCode = window.runCode;
+      } else {
+        // Fallback demo functionality
+        setTimeout(() => {
+          displaySuccess(
+            'डेमो मोड: आपका कोड यहां चलेगा', 
+            'कृपया सर्वर कनेक्ट करें। कोड:\n' + code
+          );
+          runButton.classList.remove("loading");
+          runButton.innerHTML = "▶️ कोड चलाएँ";
+        }, 1000);
+      }
+    }
+
+    // ESC key handler
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (virtualKeyboard.classList.contains("active")) {
+          toggleKeyboard();
+        }
+      }
+    });
+
+    
+  let translated = false;
+
+  function toggleTranslation() {
+  const outputElement = document.getElementById("output");
+
+  // If fresh Hindi is visible, update dataset.hindi
+  if (!outputElement.dataset.hindi || outputElement.dataset.translated === "false") {
+    outputElement.dataset.hindi = outputElement.textContent;
+  }
+
+  if (outputElement.dataset.translated === "true") {
+    // Switch back to Hindi
+    outputElement.textContent = outputElement.dataset.hindi;
+    outputElement.dataset.translated = "false";
+    } else {
+    const hindiText = outputElement.dataset.hindi;
+
+    console.log("Sending text to backend:", hindiText);
+
+    fetch("/translate_output", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: hindiText })
+      })
+      .then(res => res.json())
+      .then(data => {
+      console.log("Backend response:", data);
+      if (data.translated) {
+        outputElement.textContent = data.translated;
+        outputElement.dataset.translated = "true";
+      } else {
+        outputElement.textContent = "⚠️ Translation unavailable.";
+      }
+      })
+      .catch(err => {
+        console.error("Translation failed:", err);
+        outputElement.textContent = "⚠️ Translation failed.";
+      });
+    }
+  }
+
+
+
+
+
+  </script>
+
+</body>
+</html>

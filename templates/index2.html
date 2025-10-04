@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>कोडमॉर्फ — हिंदी कोड रनर</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+<style>
+:root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#60a5fa;--accent-2:#7c3aed;--glass: rgba(255,255,255,0.03);--radius:12px;--mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Consolas', monospace;}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans',sans-serif;background:linear-gradient(180deg,#071025 0%, #07162a 100%);color:#e6eef6}
+.app{max-width:1200px;margin:28px auto;padding:18px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+header h1{font-size:20px;margin:0;letter-spacing:0.2px}
+.controls{display:flex;gap:10px;align-items:center}
+.btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:10px 14px;border-radius:10px;color:var(--muted);cursor:pointer;font-weight:600}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:none}
+.workspace{display:grid;grid-template-columns:1fr 420px;gap:18px}
+@media(max-width:980px){.workspace{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:1px solid rgba(255,255,255,0.03);border-radius:var(--radius);padding:16px}
+.editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.CodeMirror{height:520px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);font-size:15px}
+.terminal{display:flex;flex-direction:column;gap:12px}
+.term-top{display:flex;align-items:center;gap:10px}
+.term-title{font-weight:700}
+.term-window{background:#081223;border-radius:12px;padding:12px;border:1px solid rgba(96,165,250,0.06);box-shadow:0 6px 30px rgba(2,6,23,0.6) inset}
+.term-output{height:340px;overflow:auto;border-radius:8px;padding:12px;background:linear-gradient(180deg, rgba(3,7,18,0.85), rgba(2,6,23,0.95));font-family:var(--mono);font-size:13px;color:#d6e7ff;line-height:1.5;border:1px solid rgba(255,255,255,0.02)}
+.term-output .stdout{color:#d6e7ff}
+.term-output .stderr{color:#ef4444;font-weight:700}
+.term-output .live-error{color:#f87171;font-weight:700;margin-bottom:4px;}
+.explain{background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,0.03);font-size:13px;color:var(--muted);min-height:60px}
+.kb-toggle{position:fixed;right:20px;bottom:20px;z-index:60}
+.keyboard{position:fixed;left:50%;transform:translateX(-50%);bottom:-100%;width:96%;max-width:1100px;background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 30px 60px rgba(2,6,23,0.7);transition:bottom .32s cubic-bezier(.2,.9,.3,1);z-index:50}
+.keyboard.open{bottom:22px}
+.kb-rows{display:flex;flex-direction:column;gap:8px}
+.kb-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.kb-key{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:8px 12px;border-radius:10px;min-width:44px;text-align:center;cursor:pointer;font-family:var(--mono);user-select:none;color:#e6eef6}
+.kb-key.wide{min-width:120px}
+.kb-key.func{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border:none}
+.kb-key:active{transform:translateY(1px);opacity:.95}
+.hint{font-size:12px;color:var(--muted)}
+#suggestions { position: absolute; bottom: 220px; left: 10px; right: 10px; background: #222; color: #fff; border-radius: 8px; padding: 5px; display: flex; flex-wrap: wrap; gap: 5px; z-index: 1000; font-family: 'Noto Sans Devanagari', sans-serif;}
+#suggestions button { background: #444; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: white;}
+#suggestions button:hover { background: #666;}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1>कोडमॉर्फ — हिंदी कोड रनर</h1>
+    <div class="small">हिंदी में टाइप करें</div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="examplesBtn">उदाहरण</button>
+    <button class="btn" id="clearBtn">साफ करें</button>
+    <button class="btn primary" id="runBtn">▶ चलाएँ</button>
+    <button class="btn" id="translateBtn">आउटपुट → अंग्रेज़ी</button>
+    <button class="btn" id="voiceBtn">🎤 वॉइस टाइपिंग</button>
+  </div>
+</header>
+
+<main class="workspace">
+  <section class="card">
+    <div class="editor-header"><div><div style="font-weight:700">संपादक</div></div></div>
+    <textarea id="code" placeholder="यहाँ हिंदी कोड लिखें — उदाहरण: \nछापें('नमस्ते दुनिया')"></textarea>
+  </section>
+
+  <aside class="terminal">
+    <div class="card term-top"><div><div class="term-title">टर्मिनल • आउटपुट</div></div></div>
+    <div class="term-window"><div id="termOutput" class="term-output"><div class="stdout">तैयार — कोड चलाने के लिए ▶ दबाएँ।</div></div></div>
+    <div class="explain" id="explain">यहाँ अनुवाद और व्याख्या दिखाई जाएगी।</div>
+  </aside>
+</main>
+
+<div class="kb-toggle"><button class="btn" id="toggleKb">⌨ हिंदी कीबोर्ड</button></div>
+<div class="keyboard" id="keyboard" aria-hidden="true">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-weight:700">हिंदी वर्चुअल कीबोर्ड</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="small hint">संपादक में सीधे अक्षर जोड़ें</div>
+      <button class="btn" id="closeKb">बंद करें</button>
+    </div>
+  </div>
+  <div class="kb-rows" id="kbRows"></div>
+</div>
+
+<div id="suggestions"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+<script>
+// --- Editor ---
+let editor = CodeMirror.fromTextArea(document.getElementById('code'),{
+  mode:'python',theme:'material-darker',lineNumbers:true,
+  indentUnit:4,matchBrackets:true,autoCloseBrackets:true,tabSize:4
+});
+
+// --- Dictionary ---
+const TRANSLATE = {
+  'अगर':'if','अन्यथा':'else','अन्यथा_अगर':'elif','जबतक':'while','के_लिए':'for','में':'in',
+  'पास':'pass','जारी':'continue','तोड़ें':'break','फिर':'yield','उठाओ':'raise',
+  'कोशिश':'try','पकड़ो':'except','अंततः':'finally','दावा':'assert','साथ':'with','जैसा':'as',
+  'परिभाषित':'def','वर्ग':'class','वापस_करें':'return','ग्लोबल':'global','गैरस्थानीय':'nonlocal','लैम्ब्डा':'lambda',
+  'सच':'True','झूठ':'False','कुछ_नहीं':'None',
+  'और':'and','या':'or','नहीं':'not','है':'is',
+  'आयात':'import','से':'from',
+  'छापें':'print','इनपुट':'input','लंबाई':'len','प्रकार':'type','श्रेणी':'range','सूची':'list',
+  'शब्दकोश':'dict','समुच्चय':'set','टपल':'tuple','पूर्णांक':'int','दशमलव':'float','पाठ':'str','खोलें':'open',
+  'डेल':'del','हटाएँ':'del'
+};
+const TRAN_KEYS = Object.keys(TRANSLATE).sort((a,b)=>b.length-a.length).map(k=>({k,r:new RegExp('\\b'+k+'\\b','g')}));
+
+// --- Translate Hindi to Python ---
+function translateHindiToPython(hcode){
+  let out=hcode;
+  TRAN_KEYS.forEach(({k,r})=>{out=out.replace(r,TRANSLATE[k]);});
+  out=out.replace(/[\u0966-\u096F]/g,d=>String.fromCharCode(d.charCodeAt(0)-0x0966+48));
+  return out;
+}
+
+// --- Skulpt Run ---
+function outf(text){const t=document.getElementById('termOutput');t.insertAdjacentHTML('beforeend','<div class="stdout">'+escapeHtml(text)+'</div>');t.scrollTop=t.scrollHeight;}
+function errf(text){let msg=text;const t=document.getElementById('termOutput');t.insertAdjacentHTML('beforeend','<div class="stderr">'+escapeHtml(msg)+'</div>');t.scrollTop=t.scrollHeight;}
+function builtinRead(x){if(Sk.builtinFiles===undefined||Sk.builtinFiles['files'][x]===undefined) throw "File not found: '"+x+"'";return Sk.builtinFiles['files'][x];}
+function runSkulpt(pycode){const t=document.getElementById('termOutput');t.innerHTML='';Sk.configure({output:outf,read:builtinRead,stderr:errf});Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,pycode,true)).then(()=>outf('\n⟲ निष्पादन समाप्त।')).catch(e=>errf(String(e)));}
+
+// --- Live Error Check ---
+function checkLiveErrors(code){
+  const t = document.getElementById('termOutput');
+  t.querySelectorAll('.live-error').forEach(e=>e.remove()); 
+  Sk.configure({output:()=>{}, read: builtinRead});
+  Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>', false, code, true))
+    .then(()=>{})
+    .catch(e=>{
+      const msg = e.toString().replace(/<stdin>/g,'');
+      t.insertAdjacentHTML('afterbegin','<div class="stderr live-error">'+escapeHtml(msg)+'</div>');
+    });
+}
+
+// --- Debounce ---
+function debounce(func, wait){
+  let timeout;
+  return function(...args){
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  }
+}
+
+// --- Trigger live errors ---
+editor.on("change", debounce(()=>{
+  const raw = editor.getValue();
+  const translated = translateHindiToPython(raw);
+  checkLiveErrors(translated);
+}, 500));
+
+// --- Events ---
+document.getElementById('runBtn').addEventListener('click',()=>{
+  const raw=editor.getValue();
+  const translated=translateHindiToPython(raw);
+  document.getElementById('explain').textContent='अनुवादित पायथन कोड:\n\n'+translated;
+  runSkulpt(translated);
+});
+document.getElementById('clearBtn').addEventListener('click',()=>{editor.setValue('');document.getElementById('termOutput').innerHTML='';document.getElementById('explain').textContent='यहाँ अनुवाद और व्याख्या दिखाई जाएगी।'});
+document.getElementById('examplesBtn').addEventListener('click',()=>{editor.setValue(छापें('नमस्ते दुनिया!')
+// \nनाम = 'यश'\nउमर = २५\nछापें
+('नाम:', नाम, 'उमर:', उमर));});
+
+// --- Suggestions ---
+const suggestionBox = document.getElementById("suggestions");
+function showSuggestions(prefix){
+  suggestionBox.innerHTML="";
+  if(!prefix) return;
+  const matches=Object.keys(TRANSLATE).filter(w=>w.startsWith(prefix));
+  matches.slice(0,5).forEach(word=>{
+    const btn=document.createElement("button");
+    btn.textContent=word;
+    btn.onclick=()=>{insertWord(word);suggestionBox.innerHTML="";};
+    suggestionBox.appendChild(btn);
+  });
+}
+function insertWord(word){
+  const cm=editor;const cursor=cm.getCursor();
+  const line=cm.getLine(cursor.line);
+  const start=line.lastIndexOf(' ',cursor.ch-1)+1;
+  cm.replaceRange(word,{line:cursor.line,ch:start},cursor);
+  cm.focus();
+}
+editor.on("inputRead",function(cm,change){
+  if(change.text[0].match(/[ऀ-ॿ]/)){ 
+    const cursor=cm.getCursor();
+    const line=cm.getLine(cursor.line);
+    const lastWord=line.slice(0,cursor.ch).split(/\s+/).pop();
+    showSuggestions(lastWord);
+  } else { suggestionBox.innerHTML=""; }
+});
+
+// --- Voice Typing ---
+let recognizing=false;
+let recognition;
+document.getElementById('voiceBtn').addEventListener('click',()=>{
+  if(!('webkitSpeechRecognition' in window)){alert('वॉइस टाइपिंग ब्राउज़र में समर्थित नहीं है');return;}
+  if(!recognition){
+    recognition=new webkitSpeechRecognition();
+    recognition.continuous=false;
+    recognition.interimResults=false;
+    recognition.lang='hi-IN';
+    recognition.onresult=e=>{
+      let transcript=e.results[0][0].transcript.trim();
+      insertVoiceCode(transcript);
+    };
+    recognition.onend=()=>{recognizing=false;document.getElementById('voiceBtn').textContent='🎤 वॉइस टाइपिंग';};
+  }
+  if(!recognizing){recognition.start();recognizing=true;document.getElementById('voiceBtn').textContent='🔴 रिकॉर्डिंग…';}
+  else{recognition.stop();recognizing=false;document.getElementById('voiceBtn').textContent='🎤 वॉइस टाइपिंग';}
+});
+function insertVoiceCode(text){
+  text = text.replace(/[\p{P}\p{S}]/gu, ''); // remove punctuation & symbols
+  const words = text.trim().split(/\s+/);
+  let line = "";
+  words.forEach(w => { line += w + " "; });
+  const cm = editor;
+  const cursor = cm.getCursor();
+  cm.replaceRange(line, cursor);
+  cm.focus();
+}
+
+// --- Virtual Keyboard ---
+const KB_LAYOUT=[['१','२','३','४','५','६','७','८','९','०','backspace'],['अ','आ','इ','ई','उ','ऊ','ऋ','ए','ऐ','ओ','औ'],['्','ा','ि','ी','ु','ू','ृ','े','ै','ो','ौ','ं','ः','़'],['क','ख','ग','घ','ङ','च','छ','ज','झ','ञ'],['ट','ठ','ड','ढ','ण','त','थ','द','ध','न'],['प','फ','ब','भ','म','य','र','ल','व','श'],['ष','स','ह','क्ष','त्र','ज्ञ','श्र'],['।','॥',',','.','(',')','=','space','enter']];
+function buildKeyboard(){const kbRows=document.getElementById('kbRows');kbRows.innerHTML='';KB_LAYOUT.forEach(row=>{const rowEl=document.createElement('div');rowEl.className='kb-row';row.forEach(key=>{const k=document.createElement('div');k.className='kb-key';if(key==='space'){k.classList.add('wide');k.textContent='स्पेस';}else if(key==='enter'){k.classList.add('func','wide');k.textContent='एंटर';}else if(key==='backspace'){k.classList.add('func');k.textContent='⌫ हटाएँ';}else{k.textContent=key;}k.dataset.key=key;k.addEventListener('click',onKeyClick);rowEl.appendChild(k);});kbRows.appendChild(rowEl);});}
+function onKeyClick(e){const key=e.currentTarget.dataset.key;const doc=editor.getDoc();const cursor=doc.getCursor();if(key==='backspace'){if(cursor.ch>0) doc.replaceRange('',{line:cursor.line,ch:cursor.ch-1},cursor);}else if(key==='enter'){doc.replaceRange('\n',cursor);}else if(key==='space'){doc.replaceRange(' ',cursor);}else{doc.replaceRange(key,cursor);}editor.focus();}
+const keyboard=document.getElementById('keyboard');
+document.getElementById('toggleKb').addEventListener('click',()=>{keyboard.classList.toggle('open');});
+document.getElementById('closeKb').addEventListener('click',()=>{keyboard.classList.remove('open');});
+buildKeyboard();
+
+// --- Utils ---
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
