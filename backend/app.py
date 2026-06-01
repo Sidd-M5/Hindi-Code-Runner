@@ -55,9 +55,15 @@ def normalize_hindi_numbers(code: str) -> str:
 
 # ----------------- ROUTES ----------------- #
 
-# Homepage (tutorial landing page)
+# Landing / welcome page
 @app.route("/")
 def home():
+    return render_template("landing.html")
+
+
+# Learning / tutorial page (W3-style)
+@app.route("/learn")
+def learn():
     return render_template("home.html")
 
 

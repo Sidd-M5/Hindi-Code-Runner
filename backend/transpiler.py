@@ -12,13 +12,16 @@ hindi_to_python_map = {
     # Conditions / Loops
     "अगर": "if",
     "अन्यथा": "else",
-    "अन्यथा_अगर": "elif",
+    "अगर_अन्यथा": "elif",
     "के_लिए": "for",
     "जबतक": "while",
+    "रोकें": "break",
+    "जारी_रखें":"continue",
 
     # Boolean
     "सही": "True",
     "गलत": "False",
+    "रिक्त": "None",
 
     # Data types
     "संख्या": "int",
@@ -28,7 +31,7 @@ hindi_to_python_map = {
     "शब्दकोश": "dict",
 
     # Class / Objects
-    "स्व": "self",
+    "स्वं": "self",
     "आरंभ": "__init__",
     "वर्ग": "class",
     "वस्तु": "object",
@@ -81,7 +84,7 @@ def generate_explanations(hindi_code: str) -> str:
             explanations.append("🔗 **टपल**: Python का tuple (immutable, ordered).")
         elif "शब्दकोश" in line:
             explanations.append("📚 **शब्दकोश**: dictionary (key-value pairs).")
-        elif "स्व" in line:
+        elif "स्वं" in line:
             explanations.append("👤 **स्व**: self keyword, object के current instance को दर्शाता है.")
         elif "आरंभ" in line:
             explanations.append("⚙️ **आरंभ**: यह constructor है (__init__) जो object बनाते समय चलता है.")

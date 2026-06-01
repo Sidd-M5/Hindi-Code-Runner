@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeMorph – हिंदी में कोडिंग सीखें</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --c-bg:            #0b0a18;
+      --c-surface:       #131228;
+      --c-surface2:      #1c1a35;
+      --c-border:        #2e2b50;
+      --c-accent:        #f97316;
+      --c-accent-dim:    rgba(249,115,22,0.15);
+      --c-accent-glow:   rgba(249,115,22,0.4);
+      --c-secondary:     #818cf8;
+      --c-secondary-dim: rgba(129,140,248,0.15);
+      --c-secondary-glow:rgba(129,140,248,0.3);
+      --c-text:          #e8e6f5;
+      --c-text-muted:    #8b88b0;
+      --c-text-dim:      #4a4770;
+      --c-green:         #3fb950;
+      --c-red:           #f85149;
+      --font-ui:         'Inter','Noto Sans Devanagari',sans-serif;
+      --font-code:       'JetBrains Mono','Consolas',monospace;
+      --nav-h:           60px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══ */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: var(--nav-h);
+      padding: 0 2rem;
+      background: rgba(11,10,24,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+    .brand-logo {
+      font-family: var(--font-code);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--c-text-muted);
+    }
+    .brand-logo .slash { color: var(--c-accent); }
+    .brand-info { display: flex; flex-direction: column; line-height: 1.15; }
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #f97316, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .brand-tag {
+      font-size: 0.6rem;
+      color: var(--c-text-dim);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .version-badge {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 20px;
+      background: var(--c-accent-dim);
+      color: var(--c-accent);
+      font-weight: 600;
+      border: 1px solid var(--c-accent-glow);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.38rem 0.85rem;
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      background: var(--c-surface2);
+      color: var(--c-text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-link:hover {
+      border-color: var(--c-accent);
+      color: var(--c-accent);
+      background: var(--c-accent-dim);
+    }
+    .nav-link-primary {
+      background: var(--c-accent);
+      border-color: var(--c-accent);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-link-primary:hover {
+      filter: brightness(1.1);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--c-accent-glow);
+    }
+
+    /* ══ HERO ══ */
+    .hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Radial glow background */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse at center, rgba(129,140,248,0.08) 0%, transparent 70%),
+                  radial-gradient(ellipse at 30% 50%, rgba(249,115,22,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1100px;
+      width: 100%;
+      align-items: center;
+      position: relative;
+    }
+
+    .hero-left { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      background: var(--c-secondary-dim);
+      border: 1px solid rgba(129,140,248,0.3);
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--c-secondary);
+      letter-spacing: 0.02em;
+      width: fit-content;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--c-text);
+    }
+    .hero-title .accent { color: var(--c-accent); }
+    .hero-title .secondary {
+      background: linear-gradient(90deg, #f97316, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--c-text-muted);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.75rem;
+      background: linear-gradient(90deg, #ea580c, #f97316, #fb923c);
+      background-size: 200% 100%;
+      background-position: right center;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-position 0.3s, box-shadow 0.2s;
+      font-family: var(--font-ui);
+    }
+    .btn-hero-primary:hover {
+      background-position: left center;
+      box-shadow: 0 6px 24px var(--c-accent-glow);
+      color: #fff;
+    }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.75rem;
+      background: var(--c-secondary-dim);
+      border: 1px solid rgba(129,140,248,0.35);
+      border-radius: 8px;
+      color: var(--c-secondary);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+      font-family: var(--font-ui);
+    }
+    .btn-hero-secondary:hover {
+      background: rgba(129,140,248,0.22);
+      box-shadow: 0 4px 16px var(--c-secondary-glow);
+      color: var(--c-secondary);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      padding-top: 0.5rem;
+    }
+    .stat { display: flex; flex-direction: column; gap: 0.1rem; }
+    .stat-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--c-accent);
+      font-family: var(--font-code);
+    }
+    .stat-label {
+      font-size: 0.73rem;
+      color: var(--c-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Code Preview Card ── */
+    .hero-right { position: relative; }
+
+    .code-card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(11,10,24,0.8), 0 0 0 1px rgba(129,140,248,0.08);
+    }
+
+    .code-card-chrome {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.65rem 1rem;
+      background: var(--c-surface2);
+      border-bottom: 1px solid var(--c-border);
+    }
+    .dots { display: flex; gap: 5px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .file-name {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--c-text-muted);
+      margin-left: 0.25rem;
+    }
+    .lang-pill {
+      margin-left: auto;
+      font-size: 0.62rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 20px;
+      background: var(--c-accent-dim);
+      color: var(--c-accent);
+      border: 1px solid var(--c-accent-glow);
+      font-weight: 600;
+      font-family: var(--font-code);
+    }
+
+    .code-body {
+      padding: 1.25rem;
+      background: #08071a;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      line-height: 1.75;
+    }
+
+    .line { display: flex; gap: 0.5rem; }
+    .ln {
+      color: var(--c-text-dim);
+      font-size: 0.75rem;
+      user-select: none;
+      min-width: 18px;
+      text-align: right;
+    }
+    .kw  { color: #f97316; font-weight: 600; }
+    .str { color: #a5d6ff; }
+    .fn  { color: #d2a8ff; }
+    .num { color: #79c0ff; }
+    .cm  { color: #4a4770; font-style: italic; }
+    .var { color: #e8e6f5; }
+
+    .code-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      background: var(--c-surface2);
+      border-top: 1px solid var(--c-border);
+      border-bottom: 1px solid var(--c-border);
+      font-size: 0.7rem;
+      color: var(--c-text-dim);
+      font-family: var(--font-code);
+      letter-spacing: 0.05em;
+    }
+    .divider-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--c-green);
+    }
+
+    .output-body {
+      padding: 0.85rem 1.25rem;
+      background: #08071a;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      color: var(--c-green);
+      line-height: 1.75;
+    }
+
+    /* ══ SECTION COMMON ══ */
+    section { padding: 4rem 2rem; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--c-secondary);
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.75rem;
+      color: var(--c-text);
+    }
+    .section-desc {
+      font-size: 0.95rem;
+      color: var(--c-text-muted);
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ══ FEATURES ══ */
+    .features-bg {
+      background: var(--c-surface);
+      border-top: 1px solid var(--c-border);
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--c-bg);
+      border: 1px solid var(--c-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      border-color: var(--c-secondary);
+      box-shadow: 0 0 0 3px var(--c-secondary-dim);
+      transform: translateY(-3px);
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--c-secondary-dim);
+      border: 1px solid rgba(129,140,248,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .feature-card:nth-child(2) .feature-icon {
+      background: var(--c-accent-dim);
+      border-color: var(--c-accent-glow);
+    }
+    .feature-card:nth-child(3) .feature-icon {
+      background: rgba(63,185,80,0.1);
+      border-color: rgba(63,185,80,0.25);
+    }
+
+    .feature-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--c-text);
+      margin-bottom: 0.5rem;
+    }
+    .feature-desc {
+      font-size: 0.83rem;
+      color: var(--c-text-muted);
+      line-height: 1.65;
+    }
+
+    /* ══ CURRICULUM ══ */
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .topic-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--c-text);
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .topic-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--c-secondary);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .topic-card:hover {
+      border-color: var(--c-secondary);
+      background: var(--c-surface2);
+      transform: translateX(4px);
+    }
+    .topic-card:hover::before { opacity: 1; }
+
+    .topic-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      width: 38px;
+      text-align: center;
+    }
+    .topic-info { flex: 1; min-width: 0; }
+    .topic-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+    .topic-desc {
+      font-size: 0.75rem;
+      color: var(--c-text-muted);
+    }
+    .topic-arrow {
+      color: var(--c-text-dim);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .topic-card:hover .topic-arrow {
+      color: var(--c-secondary);
+      transform: translateX(3px);
+    }
+
+    /* ══ CTA SECTION ══ */
+    .cta-section {
+      text-align: center;
+      background: var(--c-surface);
+      border-top: 1px solid var(--c-border);
+    }
+
+    .cta-title {
+      font-size: clamp(1.6rem, 2.5vw, 2rem);
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.025em;
+    }
+    .cta-sub {
+      font-size: 0.95rem;
+      color: var(--c-text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.65;
+    }
+    .cta-btns {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ══ STATUSBAR ══ */
+    .statusbar {
+      height: 26px;
+      background: var(--c-accent);
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.85);
+      gap: 1.5rem;
+      flex-shrink: 0;
+    }
+    .sb-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.7);
+      display: inline-block;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero-right { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .curriculum-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .topnav { padding: 0 1rem; }
+      .hero { padding: 3rem 1.25rem 2.5rem; }
+      section { padding: 3rem 1.25rem; }
+      .curriculum-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.25rem; }
+      .nav-link span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══ -->
+  <nav class="topnav">
+    <a class="nav-brand" href="/">
+      <div class="brand-logo"><span>&lt;</span><span class="slash">/</span><span>&gt;</span></div>
+      <div class="brand-info">
+        <span class="brand-title">CodeMorph</span>
+        <span class="brand-tag">HindCode IDE</span>
+      </div>
+      <span class="version-badge">v1.0</span>
+    </a>
+
+    <div class="nav-links">
+      <a class="nav-link" href="/learn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>सीखें</span>
+      </a>
+      {% if session.get('username') %}
+        <a class="nav-link" href="/runner">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>IDE</span>
+        </a>
+        <a class="nav-link" href="/logout">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>लॉगआउट</span>
+        </a>
+      {% else %}
+        <a class="nav-link" href="/login">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <span>लॉगिन</span>
+        </a>
+        <a class="nav-link nav-link-primary" href="/signup">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          <span>साइन अप</span>
+        </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-inner">
+
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span>🇮🇳</span>
+          भारत का पहला हिंदी कोडिंग IDE
+        </div>
+
+        <h1 class="hero-title">
+          हिंदी में<br>
+          <span class="secondary">कोड करो,</span><br>
+          हिंदी में सोचो
+        </h1>
+
+        <p class="hero-sub">
+          Python की पूरी ताकत, हिंदी की सरलता के साथ।
+          <strong style="color:var(--c-text)">अगर, जबतक, छापें</strong> जैसे हिंदी keywords से
+          असली प्रोग्राम लिखें और चलाएं।
+        </p>
+
+        <div class="hero-btns">
+          <a href="/learn" class="btn-hero-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            सीखना शुरू करें
+          </a>
+          <a href="/runner" class="btn-hero-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            IDE खोलें
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num">25+</span>
+            <span class="stat-label">हिंदी Keywords</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">9</span>
+            <span class="stat-label">पाठ्यक्रम Topics</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">12+</span>
+            <span class="stat-label">एरर translations</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Preview -->
+      <div class="hero-right">
+        <div class="code-card">
+          <div class="code-card-chrome">
+            <div class="dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <span class="file-name">program.hi</span>
+            <span class="lang-pill">HindCode</span>
+          </div>
+          <div class="code-body">
+            <div class="line"><span class="ln">1</span><span class="cm"># विद्यार्थी क्लास का उदाहरण</span></div>
+            <div class="line"><span class="ln">2</span></div>
+            <div class="line"><span class="ln">3</span><span class="kw">वर्ग&nbsp;</span><span class="fn">विद्यार्थी</span><span class="var">:</span></div>
+            <div class="line"><span class="ln">4</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">परिभाषित&nbsp;</span><span class="fn">आरंभ</span><span class="var">(</span><span class="kw">स्वं</span><span class="var">, नाम, अंक):</span></div>
+            <div class="line"><span class="ln">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">स्वं</span><span class="var">.नाम = नाम</span></div>
+            <div class="line"><span class="ln">6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">स्वं</span><span class="var">.अंक = अंक</span></div>
+            <div class="line"><span class="ln">7</span></div>
+            <div class="line"><span class="ln">8</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">परिभाषित&nbsp;</span><span class="fn">ग्रेड</span><span class="var">(</span><span class="kw">स्वं</span><span class="var">):</span></div>
+            <div class="line"><span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">अगर&nbsp;</span><span class="kw">स्वं</span><span class="var">.अंक &gt;= </span><span class="num">90</span><span class="var">:</span></div>
+            <div class="line"><span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">वापस_करें&nbsp;</span><span class="str">"A+"</span></div>
+            <div class="line"><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">अन्यथा</span><span class="var">:</span></div>
+            <div class="line"><span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">वापस_करें&nbsp;</span><span class="str">"A"</span></div>
+            <div class="line"><span class="ln">13</span></div>
+            <div class="line"><span class="ln">14</span><span class="var">व१ = </span><span class="fn">विद्यार्थी</span><span class="var">(</span><span class="str">"राहुल"</span><span class="var">, </span><span class="num">92</span><span class="var">)</span></div>
+            <div class="line"><span class="ln">15</span><span class="kw">छापें</span><span class="var">(व१.</span><span class="fn">ग्रेड</span><span class="var">())</span></div>
+          </div>
+          <div class="code-divider">
+            <div class="divider-dot"></div>
+            आउटपुट
+          </div>
+          <div class="output-body">A+</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FEATURES ══ -->
+  <section class="features-bg">
+    <div class="section-inner">
+      <div class="section-label">क्यों CodeMorph?</div>
+      <h2 class="section-title">हिंदी में प्रोग्रामिंग, इतनी आसान</h2>
+      <p class="section-desc">अंग्रेज़ी की रुकावट हटाएं। हिंदी में सोचें, हिंदी में लिखें, हिंदी में सीखें।</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⌨️</div>
+          <div class="feature-title">25+ हिंदी Keywords</div>
+          <p class="feature-desc">
+            <code style="font-family:var(--font-code);color:var(--c-accent);font-size:0.82em">अगर</code>,
+            <code style="font-family:var(--font-code);color:var(--c-accent);font-size:0.82em">जबतक</code>,
+            <code style="font-family:var(--font-code);color:var(--c-accent);font-size:0.82em">वर्ग</code> — Python के हर जरूरी keyword का हिंदी रूप।
+            OOP से लेकर loops तक, सब कुछ हिंदी में।
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚨</div>
+          <div class="feature-title">हिंदी में एरर संदेश</div>
+          <p class="feature-desc">
+            Python की errors अब अंग्रेज़ी में नहीं — दो-स्तरीय translation system
+            हर error को हिंदी में समझाता है। शुरुआत करने वालों के लिए परफेक्ट।
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <div class="feature-title">बिल्ट-इन ट्यूटोरियल</div>
+          <p class="feature-desc">
+            Variables से OOP तक — 9 topics, हर topic में 5+ examples।
+            IDE में एक क्लिक से example चलाएं और सीधे code करें।
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CURRICULUM ══ -->
+  <section>
+    <div class="section-inner">
+      <div class="section-label">पाठ्यक्रम</div>
+      <h2 class="section-title">क्या-क्या सीखेंगे?</h2>
+      <p class="section-desc">शुरुआत से लेकर Object-Oriented Programming तक — सब कुछ हिंदी में।</p>
+
+      <div class="curriculum-grid">
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">🚀</div>
+          <div class="topic-info">
+            <div class="topic-name">कोडिंग की शुरुआत</div>
+            <div class="topic-desc">कोडिंग क्या है? पहला प्रोग्राम</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">🖨️</div>
+          <div class="topic-info">
+            <div class="topic-name">छापें (Print)</div>
+            <div class="topic-desc">स्क्रीन पर आउटपुट दिखाना</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">📦</div>
+          <div class="topic-info">
+            <div class="topic-name">चर (Variables)</div>
+            <div class="topic-desc">डेटा स्टोर करना और उपयोग</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">🗃️</div>
+          <div class="topic-info">
+            <div class="topic-name">डेटा प्रकार</div>
+            <div class="topic-desc">int, str, bool, None</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">🔀</div>
+          <div class="topic-info">
+            <div class="topic-name">शर्तें (if / else)</div>
+            <div class="topic-desc">अगर, अन्यथा, अगर_अन्यथा</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">🔁</div>
+          <div class="topic-info">
+            <div class="topic-name">चक्र (Loops)</div>
+            <div class="topic-desc">के_लिए, जबतक, रोकें</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">⚙️</div>
+          <div class="topic-info">
+            <div class="topic-name">प्रकार्य (Functions)</div>
+            <div class="topic-desc">परिभाषित, वापस_करें</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">📋</div>
+          <div class="topic-info">
+            <div class="topic-name">संग्रह (Collections)</div>
+            <div class="topic-desc">सूची, टपल, शब्दकोश</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+        <a href="/learn" class="topic-card">
+          <div class="topic-icon">🏛️</div>
+          <div class="topic-info">
+            <div class="topic-name">OOP – वर्ग और वस्तु</div>
+            <div class="topic-desc">वर्ग, आरंभ, स्वं</div>
+          </div>
+          <span class="topic-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="cta-section">
+    <div class="section-inner">
+      <h2 class="cta-title">आज ही <span style="background:linear-gradient(90deg,#f97316,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">शुरुआत</span> करें</h2>
+      <p class="cta-sub">अकाउंट बनाएं, हिंदी में कोड लिखें, और अपना पहला प्रोग्राम चलाएं।<br>बिल्कुल मुफ्त।</p>
+      <div class="cta-btns">
+        <a href="/signup" class="btn-hero-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          मुफ्त अकाउंट बनाएं
+        </a>
+        <a href="/learn" class="btn-hero-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          पहले देखें
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STATUS BAR ══ -->
+  <div class="statusbar">
+    <span><span class="sb-dot"></span> CodeMorph</span>
+    <span>HindCode IDE v1.0</span>
+    <span style="margin-left:auto">🇮🇳 हिंदी में कोडिंग</span>
+  </div>
+
+</body>
+</html>
